@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Prefeitura de Limeira - Gestão de Escala</title>
+    <link rel="shortcut icon" href="https://placehold.co/32x32/2563eb/FFFFFF?text=P" type="image/x-icon">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    borderRadius: { 'sm': '8px' },
+                    colors: {
+                        'kyro-orange': { 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* ===== ESTILOS GLOBAIS ===== */
+        :root {
+            --table-font-size: min(1.6vh, 0.75vw);
+            --table-line-height: 1.1;
+            --table-cell-padding: 0.2vh;
+        }
+        body { background-color: #f7f9fc; color: #0f1b33; font-size: 0.9rem; overflow: hidden; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 0px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+        /* ===== LAYOUT COM MENU LATERAL ===== */
+        .app-layout {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .side-menu {
+            width: 210px;
+            background: #ffffff;
+            border-right: 1px solid #eef1f6;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .side-menu-header {
+            padding: 16px 12px;
+            border-bottom: 1px solid #eef1f6;
+            background: #f9fafb;
+        }
+        .side-menu-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #9ca3af;
+        }
+
+        /* ===== GRADE DE ÍCONES (MÓDULOS DO SISTEMA) ===== */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px 8px;
+            padding: 18px 12px;
+        }
+        .menu-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 7px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 4px 2px;
+            border-radius: 10px;
+            transition: background 0.15s ease;
+        }
+        .menu-item:hover { background: #f3f4f6; }
+        .menu-item.active { background: #eef4ff; }
+        .menu-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            color: #ffffff;
+            transition: box-shadow 0.15s ease, transform 0.15s ease;
+        }
+        .menu-item:hover .menu-icon { transform: scale(1.05); }
+        .menu-item.active .menu-icon {
+            box-shadow: 0 0 0 4px #ffffff, 0 0 0 7px #bfdbfe;
+        }
+        .menu-label {
+            font-size: 0.62rem;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.15;
+            color: #374151;
+            max-width: 70px;
+        }
+        .menu-item.active .menu-label { color: #2563eb; }
+
+        /* Cores dos círculos por módulo */
+        .mi-escala { background: #7c3aed; }
+        .mi-modelos { background: #0ea5e9; }
+        .mi-resumo { background: #92400e; }
+        .mi-ferramentas { background: #d97706; }
+        .mi-travas { background: #b91c1c; }
+        .mi-estrutura { background: #0f766e; }
+
+        /* ===== RODAPÉ DO MENU ===== */
+        .side-menu-footer {
+            margin-top: auto;
+            padding: 10px;
+            border-top: 1px solid #eef1f6;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .footer-actions { display: flex; gap: 6px; }
+        .footer-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 0;
+            border: 1px solid #eef1f6;
+            border-radius: 8px;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 0.72rem;
+            background: #ffffff;
+        }
+        .footer-btn:hover { background: #f3f4f6; color: #0f1b33; }
+
+        .main-area {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+        .module { display: none; height: 100%; flex-direction: column; overflow: hidden; }
+        .module.active { display: flex; }
+
+        /* ===== TABELA FLAT ===== */
+        .modern-table {
+            width: 100%;
+            height: 100%;
+            border-collapse: collapse;
+            font-size: var(--table-font-size);
+            line-height: var(--table-line-height);
+            table-layout: fixed;
+        }
+        .modern-table th {
+            background: #f9fafb; color: #4b5563; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.05em; padding: 4px 2px; border-bottom: 1px solid #cbd5e1; border-right: 1px solid #eef1f6;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            height: 3vh;
+            user-select: none;
+        }
+        .modern-table td {
+            border-bottom: 1px solid #eef1f6; border-right: 1px solid #eef1f6;
+            padding: 0 2px;
+            text-align: center; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis;
+            height: 1px;
+            cursor: pointer;
+        }
+        .modern-table tr:hover td { background-color: #f3f4f6; }
+
+        /* ===== ESTADOS DE CÉLULA ===== */
+        .editable:hover { background-color: #eef4ff !important; color: #2563eb; font-weight: 600; }
+        .cursor-troca .editable { cursor: alias !important; }
+        .celula-troca-origem { background-color: #dbeafe !important; border: 1px solid #2563eb !important; }
+        .celula-travada { background-color: #f9fafb !important; color: #6b7280; font-weight: 600; border: 1px solid #cbd5e1; }
+        .dia-hoje { background-color: #f3f4f6 !important; border-left: 3px solid #2563eb; }
+        .bg-custom-gray { background-color: #f3f4f6 !important; }
+        .bg-custom-gray-header { background-color: #eef1f6 !important; color: #0f1b33 !important; }
+        .bg-custom-gray-group { background-color: #eef1f6 !important; color: #374151 !important; }
+        .sync-active { background-color: #dcfce7; transition: background-color 1.5s; }
+
+        /* ===== DRAG AND DROP ===== */
+        .draggable-item { cursor: grab; }
+        .draggable-item:active { cursor: grabbing; }
+        .drag-over { border: 1px dashed #2563eb !important; background-color: #eef4ff !important; }
+        .dragging { opacity: 0.4; border: 1px dashed #9ca3af; }
+        .drop-target-group { border: 1px solid #2563eb !important; }
+
+        /* ===== PAINÉIS / MÓDULOS ===== */
+        .panel { display: flex; flex-direction: column; overflow: hidden; height: 100%; }
+        .panel-header {
+            padding: 8px 12px; border-bottom: 1px solid #eef1f6; background: #f9fafb;
+            display: flex; justify-content: space-between; align-items: center; min-height: 40px;
+        }
+        .panel-content { padding: 0; overflow-y: auto; flex: 1; }
+
+        /* ===== BOTÕES FLAT ===== */
+        .btn {
+            display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
+            border-radius: 8px; font-weight: 500; font-size: 0.75rem; cursor: pointer; border: 1px solid transparent;
+        }
+        .btn-sm { padding: 4px 8px; font-size: 0.7rem; }
+        .btn-primary { background: #2563eb; color: white; border-color: #1d4ed8; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary { background: #ffffff; color: #374151; border-color: #cbd5e1; }
+        .btn-secondary:hover { background: #f9fafb; border-color: #9ca3af; }
+        .btn-ghost { background: transparent; color: #4b5563; }
+        .btn-ghost:hover { background: #f3f4f6; color: #0f1b33; }
+        .btn-danger { background: #dc2626; color: white; border-color: #b91c1c; }
+        .btn-active { background: #eef4ff; color: #2563eb; border-color: #2563eb; }
+        .editor-btn {
+            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+            border-radius: 8px; color: #4b5563; cursor: pointer;
+        }
+        .editor-btn:hover { background-color: #eef1f6; color: #0f1b33; }
+        .valign-top { justify-content: flex-start; }
+        .valign-middle { justify-content: center; }
+        .valign-bottom { justify-content: flex-end; }
+        .modal-backdrop { background: rgba(0, 0, 0, 0.4); }
+        .input-std {
+            width: 100%; padding: 6px; border: 1px solid #cbd5e1; border-radius: 8px;
+            font-size: 0.75rem; background: #ffffff; outline: none;
+        }
+        .input-std:focus { border-color: #2563eb; }
+
+        /* ===== RESUMO ===== */
+        .resumo-table-container { overflow-x: auto; }
+        .resumo-table { border-collapse: collapse; font-size: 10px; width: auto; min-width: 100%; }
+        .resumo-table th, .resumo-table td {
+            padding: 6px 8px; border-bottom: 1px solid #f3f4f6; border-right: 1px solid #f3f4f6;
+            white-space: nowrap; text-align: center;
+        }
+        .resumo-col-nome {
+            position: sticky; left: 0; background: white; z-index: 10;
+            border-right: 1px solid #cbd5e1; text-align: left; width: 120px;
+            min-width: 120px; max-width: 120px; overflow: hidden; text-overflow: ellipsis;
+        }
+        .resumo-table thead .resumo-col-nome { background: #f9fafb; border-bottom: 1px solid #cbd5e1; }
+        .resumo-table thead th { border-bottom: 1px solid #cbd5e1; background: #f9fafb; }
+
+        @media (max-width: 900px) {
+            #mes-select, #ano-input { font-size: 0.75rem; }
+            .btn { padding: 6px 10px; }
+            .side-menu { width: 84px; }
+            .menu-grid { grid-template-columns: 1fr; }
+            .menu-icon { width: 40px; height: 40px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden bg-white">
+
+    <!-- ===== LAYOUT PRINCIPAL: MENU LATERAL + CONTEÚDO ===== -->
+    <div class="app-layout" id="dashboard-container">
+
+        <!-- MENU LATERAL - MÓDULOS DO SISTEMA (estilo portal-rh) -->
+        <aside class="side-menu" id="side-menu">
+            <div class="side-menu-header">
+                <div class="side-menu-title">Módulos do Sistema</div>
+            </div>
+            <nav class="menu-grid">
+                <button class="menu-item active" data-module="escala" onclick="navegarModulo('escala')">
+                    <span class="menu-icon mi-escala"><i class="fas fa-calculator"></i></span>
+                    <span class="menu-label">Escala</span>
+                </button>
+                <button class="menu-item" data-module="modelos" onclick="navegarModulo('modelos')">
+                    <span class="menu-icon mi-modelos"><i class="fas fa-save"></i></span>
+                    <span class="menu-label">Modelos</span>
+                </button>
+                <button class="menu-item" data-module="resumo" onclick="navegarModulo('resumo')">
+                    <span class="menu-icon mi-resumo"><i class="fas fa-chart-bar"></i></span>
+                    <span class="menu-label">Resumo</span>
+                </button>
+                <button class="menu-item" data-module="ferramentas" onclick="navegarModulo('ferramentas')">
+                    <span class="menu-icon mi-ferramentas"><i class="fas fa-bolt"></i></span>
+                    <span class="menu-label">Ferramentas Rápidas</span>
+                </button>
+                <button class="menu-item" data-module="travas" onclick="navegarModulo('travas')">
+                    <span class="menu-icon mi-travas"><i class="fas fa-lock"></i></span>
+                    <span class="menu-label">Travas</span>
+                </button>
+                <button class="menu-item" data-module="estrutura" onclick="navegarModulo('estrutura')">
+                    <span class="menu-icon mi-estrutura"><i class="fas fa-columns"></i></span>
+                    <span class="menu-label">Estrutura</span>
+                </button>
+            </nav>
+
+            <!-- Rodapé do menu: sincronização + utilidades -->
+            <div class="side-menu-footer">
+                <div id="sync-indicator" class="hidden items-center justify-center gap-1 bg-green-50 text-green-700 px-2 py-1 rounded-sm border border-green-200">
+                    <div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                    <span class="text-[9px] font-bold uppercase tracking-wider">Sincronizado</span>
+                </div>
+                <div class="footer-actions">
+                    <button onclick="abrirModalMestre()" class="footer-btn" title="Dados Mestre">
+                        <i class="fas fa-database"></i>
+                    </button>
+                    <button onclick="exportarBackupMestre()" class="footer-btn" title="Salvar Backup dos Funcionários">
+                        <i class="fas fa-file-export"></i>
+                    </button>
+                    <label class="footer-btn cursor-pointer" title="Restaurar Backup de Funcionários">
+                        <i class="fas fa-file-import"></i>
+                        <input type="file" id="input-importar" class="hidden" accept=".json">
+                    </label>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CONTEÚDO -->
+        <main class="main-area" id="painel-central">
+
+            <!-- MÓDULO: ESCALA -->
+            <section id="mod-escala" class="module active">
+                <div class="panel-header flex-wrap gap-2 py-2 flex-shrink-0">
+                    <div class="flex items-center bg-white border border-gray-300 rounded-sm p-0.5">
+                        <button id="prev-month" class="w-6 h-6 flex items-center justify-center hover:bg-gray-100 text-gray-600"><i class="fas fa-chevron-left text-xs"></i></button>
+                        <div class="flex flex-col items-center px-2">
+                            <select id="mes-select" class="text-xs font-bold bg-transparent border-none cursor-pointer text-center p-0 outline-none text-gray-900 uppercase">
+                                <option value="0">JAN</option><option value="1">FEV</option><option value="2">MAR</option>
+                                <option value="3">ABR</option><option value="4">MAI</option><option value="5">JUN</option>
+                                <option value="6">JUL</option><option value="7">AGO</option><option value="8">SET</option>
+                                <option value="9">OUT</option><option value="10">NOV</option><option value="11">DEZ</option>
+                            </select>
+                            <input type="number" id="ano-input" class="text-[10px] text-gray-500 bg-transparent border-none w-10 text-center p-0 outline-none font-medium" value="2024">
+                        </div>
+                        <button id="next-month" class="w-6 h-6 flex items-center justify-center hover:bg-gray-100 text-gray-600"><i class="fas fa-chevron-right text-xs"></i></button>
+                    </div>
+                    <div class="h-6 w-px bg-gray-200 mx-2 hidden sm:block"></div>
+                    <button id="gerar-escala-btn" class="btn btn-primary"><i class="fas fa-bolt"></i> <span class="hidden lg:inline">Gerar Escala</span></button>
+                    <button id="embaralhar-btn" class="btn btn-secondary" title="Gerar Aleatório"><i class="fas fa-random text-gray-500"></i></button>
+                    <button id="btn-troca-rapida" class="btn btn-secondary" title="Modo Troca Rápida"><i class="fas fa-exchange-alt text-gray-500"></i></button>
+                    <div class="flex-1"></div>
+                    <div class="relative">
+                        <button id="btn-export-toggle" class="btn btn-secondary font-semibold">Exportar <i class="fas fa-chevron-down text-[10px] ml-1"></i></button>
+                        <div id="export-menu" class="absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-sm shadow-sm hidden z-50 py-1">
+                            <button onclick="exportarExcelOriginal()" class="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 text-gray-800 flex items-center gap-2 font-medium"><i class="fas fa-file-excel text-gray-400"></i> Excel</button>
+                            <button onclick="exportarPDFOriginal()" class="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 text-gray-800 flex items-center gap-2 font-medium"><i class="fas fa-file-pdf text-gray-400"></i> PDF</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-hidden relative bg-white flex flex-col">
+                    <table class="modern-table" id="tabela-principal">
+                        <thead id="tabela-head"></thead>
+                        <tbody id="tabela-escala"></tbody>
+                    </table>
+                </div>
+                <div class="bg-white border-t border-gray-200 flex-shrink-0 flex flex-col" style="height: 12vh; min-height: 60px; max-height: 120px;">
+                    <div class="px-3 py-1 flex items-center justify-between border-b border-gray-100 bg-gray-50">
+                        <div class="flex items-center gap-1">
+                            <button onclick="execCmd('bold')" class="editor-btn" title="Negrito"><i class="fas fa-bold text-[10px]"></i></button>
+                            <button onclick="execCmd('italic')" class="editor-btn" title="Itálico"><i class="fas fa-italic text-[10px]"></i></button>
+                            <button onclick="execCmd('underline')" class="editor-btn" title="Sublinhado"><i class="fas fa-underline text-[10px]"></i></button>
+                            <div class="h-4 w-px bg-gray-300 mx-2 hidden sm:block"></div>
+                            <button onclick="execCmd('justifyLeft')" class="editor-btn hidden sm:flex" title="Esquerda"><i class="fas fa-align-left text-[10px]"></i></button>
+                            <button onclick="execCmd('justifyCenter')" class="editor-btn hidden sm:flex" title="Centro"><i class="fas fa-align-center text-[10px]"></i></button>
+                            <button onclick="execCmd('justifyRight')" class="editor-btn hidden sm:flex" title="Direita"><i class="fas fa-align-right text-[10px]"></i></button>
+                            <div class="h-4 w-px bg-gray-300 mx-2 hidden sm:block"></div>
+                            <button onclick="setVerticalAlign('top')" class="editor-btn" title="Topo"><i class="fas fa-arrow-up text-[10px]"></i></button>
+                            <button onclick="setVerticalAlign('middle')" class="editor-btn" title="Meio"><i class="fas fa-arrows-alt-v text-[10px]"></i></button>
+                            <button onclick="setVerticalAlign('bottom')" class="editor-btn" title="Base"><i class="fas fa-arrow-down text-[10px]"></i></button>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <input type="color" onchange="execCmd('foreColor', this.value)" class="w-4 h-4 p-0 border-0 bg-transparent cursor-pointer" title="Cor Texto">
+                            <input type="color" onchange="execCmd('hiliteColor', this.value)" value="#ffffff" class="w-4 h-4 p-0 border-0 bg-transparent cursor-pointer" title="Cor Fundo">
+                        </div>
+                    </div>
+                    <div id="editor-obs"
+                         class="flex-1 p-2 text-xs text-gray-800 focus:outline-none overflow-y-auto bg-white flex flex-col"
+                         contenteditable="true"
+                         style="font-family: 'Inter', sans-serif;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- MÓDULO: MODELOS -->
+            <section id="mod-modelos" class="module">
+                <div class="panel-header">
+                    <span class="font-bold text-gray-800 text-xs tracking-wide"><i class="fas fa-save text-gray-400 mr-2"></i>MODELOS</span>
+                </div>
+                <div class="panel-content p-4 bg-white space-y-3">
+                    <div class="flex gap-2">
+                        <input type="text" id="novo-modelo-nome" class="input-std flex-1" placeholder="Nome do modelo...">
+                        <button onclick="salvarModelo()" class="btn btn-secondary font-semibold border-gray-300">Salvar</button>
+                    </div>
+                    <div class="pt-2 border-t border-gray-100">
+                        <div id="lista-modelos" class="space-y-1 max-h-64 overflow-y-auto custom-scrollbar"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MÓDULO: RESUMO -->
+            <section id="mod-resumo" class="module">
+                <div class="panel-header">
+                    <span class="font-bold text-gray-800 text-xs tracking-wide"><i class="fas fa-chart-bar text-gray-500 mr-2"></i>RESUMO</span>
+                    <span class="text-[9px] bg-gray-200 text-gray-700 px-2 py-1 rounded-sm font-bold tracking-wider" id="total-dias-badge">0 DIAS</span>
+                </div>
+                <div class="panel-content resumo-table-container custom-scrollbar bg-white">
+                    <table class="resumo-table">
+                        <thead class="text-[9px] text-gray-600 sticky top-0 z-20">
+                            <tr id="resumo-header"></tr>
+                        </thead>
+                        <tbody id="lista-resumo" class="text-[10px] bg-white"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- MÓDULO: FERRAMENTAS RÁPIDAS -->
+            <section id="mod-ferramentas" class="module">
+                <div class="panel-header">
+                    <span class="font-bold text-gray-800 text-xs tracking-wide"><i class="fas fa-bolt text-gray-500 mr-2"></i>FERRAMENTAS RÁPIDAS</span>
+                </div>
+                <div class="panel-content p-4 bg-white space-y-3">
+                    <div class="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-2">Destaques</div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <select id="busca-func" class="input-std h-8 text-xs"></select>
+                        <button onclick="limparDestaques()" class="btn btn-secondary h-8 w-8 justify-center p-0" title="Limpar"><i class="fas fa-eraser text-gray-500"></i></button>
+                    </div>
+                    <div class="flex gap-2 justify-center">
+                        <button onclick="destacarCor('#fef08a')" class="w-5 h-5 rounded-sm bg-yellow-200 border border-yellow-400"></button>
+                        <button onclick="destacarCor('#bbf7d0')" class="w-5 h-5 rounded-sm bg-green-200 border border-green-400"></button>
+                        <button onclick="destacarCor('#fecaca')" class="w-5 h-5 rounded-sm bg-red-200 border border-red-400"></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MÓDULO: TRAVAS -->
+            <section id="mod-travas" class="module">
+                <div class="panel-header">
+                    <span class="font-bold text-gray-800 text-xs tracking-wide"><i class="fas fa-lock text-gray-400 mr-2"></i>TRAVAS</span>
+                </div>
+                <div class="panel-content p-4 bg-white space-y-3">
+                    <div class="space-y-2">
+                        <select id="config-func" class="input-std text-xs"></select>
+                        <select id="config-slot" class="input-std text-xs"></select>
+                        <button onclick="adicionarRegraFixa()" class="w-full btn btn-secondary justify-center text-xs font-semibold">
+                            Travar Posição
+                        </button>
+                    </div>
+                    <div class="pt-2 border-t border-gray-100">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Ativas</span>
+                            <button onclick="limparTodasRegras()" class="text-[10px] text-red-600 font-bold hover:underline">Limpar</button>
+                        </div>
+                        <div id="lista-regras" class="space-y-1 max-h-64 overflow-y-auto pr-1 custom-scrollbar"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MÓDULO: ESTRUTURA -->
+            <section id="mod-estrutura" class="module">
+                <div class="panel-header">
+                    <span class="font-bold text-gray-800 text-xs tracking-wide"><i class="fas fa-columns text-gray-400 mr-2"></i>ESTRUTURA</span>
+                </div>
+                <div class="panel-content overflow-y-auto p-4 bg-white space-y-3 custom-scrollbar">
+                    <div id="editor-estrutura-lista" class="space-y-3"></div>
+                    <button onclick="adicionarGrupo()" class="w-full btn btn-secondary border-dashed justify-center text-gray-500 hover:text-gray-900 bg-gray-50 font-semibold text-xs py-2">
+                        + Novo Grupo
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ===== MODAL EDIÇÃO ===== -->
+    <div id="modal-edicao" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center z-50">
+        <div class="bg-white p-6 border border-gray-300 shadow-sm rounded-sm w-80">
+            <h4 class="font-bold text-gray-900 mb-4">Editar Célula</h4>
+            <select id="modal-select" class="input-std mb-6 hidden text-sm py-2"></select>
+            <input type="text" id="modal-input" class="input-std mb-6 hidden text-sm py-2" placeholder="Digite o novo valor...">
+            <div class="flex justify-end gap-3">
+                <button onclick="fecharModal()" class="btn btn-secondary font-medium">Cancelar</button>
+                <button onclick="salvarEdicaoManual()" class="btn btn-primary font-medium">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODAL MESTRE ===== -->
+    <div id="modal-mestre" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center z-50">
+        <div class="bg-white border border-gray-300 shadow-sm rounded-sm w-[900px] h-[70vh] flex flex-col overflow-hidden">
+            <div class="p-5 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                <h3 class="font-bold text-gray-900 text-lg flex items-center gap-2">Dados Mestre</h3>
+                <button onclick="document.getElementById('modal-mestre').classList.add('hidden')" class="text-gray-400 hover:text-gray-900"><i class="fas fa-times text-lg"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1 space-y-8 custom-scrollbar">
+                <div>
+                    <h4 class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-3">Funcionários</h4>
+                    <table class="w-full text-sm text-left border-collapse">
+                        <thead class="bg-gray-100 text-gray-600 border-y border-gray-300"><tr><th class="p-2 font-semibold">Nome</th><th class="p-2 font-semibold">Cargo</th><th class="p-2 font-semibold">Almoço</th></tr></thead>
+                        <tbody id="mestre-funcs" class="text-gray-800 divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+                <div class="grid grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-3">Férias</h4>
+                        <table class="w-full text-sm text-left border-collapse">
+                            <thead class="bg-gray-100 text-gray-600 border-y border-gray-300"><tr><th class="p-2 font-semibold">Func</th><th class="p-2 font-semibold">Início</th><th class="p-2 font-semibold">Fim</th></tr></thead>
+                            <tbody id="mestre-ferias" class="text-gray-800 divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-500 text-xs uppercase tracking-wider mb-3">Feriados</h4>
+                        <table class="w-full text-sm text-left border-collapse">
+                            <thead class="bg-gray-100 text-gray-600 border-y border-gray-300"><tr><th class="p-2 font-semibold">Data</th><th class="p-2 font-semibold">Nome</th></tr></thead>
+                            <tbody id="mestre-feriados" class="text-gray-800 divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PARTE 2: JS (colar abaixo) ===== -->
+    <script>
+        // ============================================================
+// PARTE 2 - JAVASCRIPT (mantido intacto, adaptado ao menu lateral)
+// ============================================================
+
+// --- ESTADO ---
+const MASTER_DB_KEY = 'limeira_dados_integrados_v6';
+const CONFIG_DB_KEY = 'escala_config_v23';
+const MODELS_DB_KEY = 'escala_modelos_v1';
+const DEFAULT_MOCK = { funcionarios: [], ferias: [], feriados: [] };
+const DEFAULT_OBS_TEXT = '<div style="text-align: center;"><b>Obs.: A escala poderá sofrer alterações.</b></div><div style="text-align: center;"><b>Na abertura dos guichês, 1° e 2° suplentes, permanecerão atendendo até às 09:30 ou a fila zerar.</b></div>';
+const DEFAULT_STRUCTURE = [
+    { title: "", grayTitle: false, cols: [
+        { key: 'dataLabel', label: 'DIAS', type: 'system', grayHeader: false, grayBody: false },
+        { key: 'semLabel', label: 'DIAS SEM.', type: 'system', grayHeader: false, grayBody: false },
+        { key: 'senha', label: 'SENHA', type: 'system', grayHeader: false, grayBody: false }
+    ]},
+    { title: "", grayTitle: false, cols: [
+        { key: 'fixo1', label: 'FIXO 1', type: 'fixo', grayHeader: true, grayBody: false },
+        { key: 'fixo2', label: 'FIXO 2', type: 'fixo', grayHeader: true, grayBody: false },
+        { key: 'fixo3', label: 'FIXO 3', type: 'fixo', grayHeader: true, grayBody: false }
+    ]},
+    { title: "10 SENHAS OU 15 MIN / ALMOÇO", grayTitle: false, cols: [
+        { key: 'sup1', label: '1° SUPLENTE', type: 'suplente', grayHeader: true, grayBody: false },
+        { key: 'sup2', label: '2° SUPLENTE', type: 'suplente', grayHeader: true, grayBody: false }
+    ]},
+    { title: "15 SENHAS OU 20 MIN E ALMOÇO", grayTitle: false, cols: [
+        { key: 'sup3', label: '3° SUPLENTE', type: 'suplente', grayHeader: false, grayBody: false },
+        { key: 'sup4', label: '4° SUPLENTE', type: 'suplente', grayHeader: false, grayBody: false }
+    ]},
+    { title: "ACIMA 20 MINUTOS, ALMOÇO, QUANDO NECESSÁRIO", grayTitle: false, cols: [
+        { key: 'sup5', label: '5° SUPLENTE', type: 'suplente', grayHeader: false, grayBody: true },
+        { key: 'sup6', label: '6° SUPLENTE', type: 'suplente', grayHeader: false, grayBody: true }
+    ]}
+];
+let masterData = { funcionarios: [], ferias: [], feriados: [] };
+let appState = {
+    escala: [], regrasFixas: [], destaques: {},
+    structure: JSON.parse(JSON.stringify(DEFAULT_STRUCTURE)),
+    mes: new Date().getMonth(), ano: new Date().getFullYear(),
+    observacoes: {}, observacoesConfig: {},
+    ui: { leftPanel: true, rightPanel: true },
+    models: []
+};
+let editando = null;
+let modoTrocaRapida = false;
+let trocaOrigem = null;
+
+// --- NAVEGAÇÃO DO MENU LATERAL (novo) ---
+function navegarModulo(modulo) {
+    document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+    document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+    const sec = document.getElementById('mod-' + modulo);
+    if (sec) sec.classList.add('active');
+    const btn = document.querySelector(`.menu-item[data-module="${modulo}"]`);
+    if (btn) btn.classList.add('active');
+}
+
+// --- INIT ---
+document.addEventListener('DOMContentLoaded', () => {
+    carregarDados();
+    setupEvents();
+    atualizarUI();
+    carregarObservacaoAtual();
+    if (masterData.funcionarios.length > 0) {
+        const el = document.getElementById('sync-indicator');
+        if (el) { el.classList.remove('hidden'); el.classList.add('flex'); }
+    }
+});
+window.addEventListener('storage', function(e) {
+    if (e.key === MASTER_DB_KEY) {
+        const el = document.getElementById('sync-indicator');
+        if (el) {
+            el.classList.remove('hidden'); el.classList.add('flex', 'sync-active');
+            setTimeout(() => el.classList.remove('sync-active'), 1500);
+        }
+        carregarDadosMestre();
+        atualizarUI();
+    }
+});
+
+function carregarDadosMestre() {
+    const rawMaster = localStorage.getItem(MASTER_DB_KEY);
+    masterData = rawMaster ? JSON.parse(rawMaster) : DEFAULT_MOCK;
+    const selectFunc = document.getElementById('config-func');
+    const selectBusca = document.getElementById('busca-func');
+    const selFunc = selectFunc.value; const selBusca = selectBusca.value;
+    selectFunc.innerHTML = '<option value="">Funcionário...</option>';
+    selectBusca.innerHTML = '<option value="">Selecionar...</option>';
+    getFuncionariosEscala().forEach(f => {
+        const n = f.apelido || f.nome;
+        selectFunc.add(new Option(n, n));
+        selectBusca.add(new Option(n, n));
+    });
+    if (selFunc) selectFunc.value = selFunc;
+    if (selBusca) selectBusca.value = selBusca;
+}
+function carregarDados() {
+    carregarDadosMestre();
+    const rawConfig = localStorage.getItem(CONFIG_DB_KEY);
+    if (rawConfig) {
+        const s = JSON.parse(rawConfig);
+        appState.regrasFixas = s.regrasFixas || [];
+        appState.escala = s.escala || [];
+        appState.destaques = s.destaques || {};
+        appState.observacoes = s.observacoes || {};
+        appState.observacoesConfig = s.observacoesConfig || {};
+        appState.ui = { ...appState.ui, ...(s.ui || {}) };
+        if (s.structure && s.structure.length > 0) {
+            appState.structure = s.structure.map(g => ({
+                ...g,
+                grayTitle: g.grayTitle !== undefined ? g.grayTitle : false,
+                cols: g.cols.map(c => ({
+                    ...c,
+                    grayHeader: c.grayHeader !== undefined ? c.grayHeader : (c.gray || false),
+                    grayBody: c.grayBody !== undefined ? c.grayBody : (c.gray || false)
+                }))
+            }));
+        }
+        if (appState.escala.length) {
+            appState.escala.forEach(l => {
+                l.data = new Date(l.data);
+                l.diaSemana = new Date(l.diaSemana);
+            });
+        }
+    }
+    const rawModels = localStorage.getItem(MODELS_DB_KEY);
+    appState.models = rawModels ? JSON.parse(rawModels) : [];
+    document.getElementById('mes-select').value = appState.mes;
+    document.getElementById('ano-input').value = appState.ano;
+}
+function salvarEstado() {
+    localStorage.setItem(CONFIG_DB_KEY, JSON.stringify(appState));
+}
+function setupEvents() {
+    document.getElementById('gerar-escala-btn').addEventListener('click', () => gerarEscala(false));
+    document.getElementById('embaralhar-btn').addEventListener('click', () => gerarEscala(true));
+    document.getElementById('prev-month').addEventListener('click', () => mudarMes(-1));
+    document.getElementById('next-month').addEventListener('click', () => mudarMes(1));
+    document.getElementById('mes-select').addEventListener('change', (e) => { appState.mes = parseInt(e.target.value); atualizarUI(); });
+    document.getElementById('ano-input').addEventListener('change', (e) => { appState.ano = parseInt(e.target.value); atualizarUI(); });
+    document.getElementById('input-importar').addEventListener('change', importarDados);
+    document.getElementById('btn-troca-rapida').addEventListener('click', toggleTrocaRapida);
+    document.getElementById('btn-export-toggle').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('export-menu').classList.toggle('hidden'); });
+    document.addEventListener('click', (e) => {
+        const menu = document.getElementById('export-menu');
+        const btn = document.getElementById('btn-export-toggle');
+        if (menu && !menu.classList.contains('hidden') && !menu.contains(e.target) && e.target !== btn) { menu.classList.add('hidden'); }
+    });
+    document.getElementById('tabela-escala').addEventListener('click', (e) => {
+        const cell = e.target.closest('.editable');
+        if (!cell) return;
+        if (modoTrocaRapida) handleTroca(cell);
+        else { const nome = cell.innerText.trim(); if (nome && nome !== '-') document.getElementById('busca-func').value = nome; }
+    });
+    document.getElementById('tabela-escala').addEventListener('dblclick', (e) => {
+        if (modoTrocaRapida) return;
+        const cell = e.target.closest('.editable');
+        if (cell) abrirModal(cell.dataset.idx, cell.dataset.key);
+    });
+    document.getElementById('editor-obs').addEventListener('input', salvarObservacaoAtual);
+}
+
+// --- MODELOS ---
+function renderModelos() {
+    const lista = document.getElementById('lista-modelos');
+    lista.innerHTML = '';
+    appState.models.forEach((m, idx) => {
+        lista.innerHTML += `
+            <div class="flex justify-between items-center border-b border-gray-100 py-1.5 text-xs">
+                <span class="font-medium text-gray-800 truncate">${m.name}</span>
+                <div class="flex gap-2">
+                    <button onclick="carregarModelo(${idx})" class="text-gray-500 hover:text-gray-900" title="Carregar"><i class="fas fa-upload"></i></button>
+                    <button onclick="excluirModelo(${idx})" class="text-red-500 hover:text-red-700" title="Excluir"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>`;
+    });
+}
+function salvarModelo() {
+    const nomeInput = document.getElementById('novo-modelo-nome');
+    const nome = nomeInput.value.trim();
+    if (!nome) return alert("Digite um nome para o modelo!");
+    const modelo = { name: nome, structure: JSON.parse(JSON.stringify(appState.structure)) };
+    appState.models.push(modelo);
+    localStorage.setItem(MODELS_DB_KEY, JSON.stringify(appState.models));
+    nomeInput.value = '';
+    renderModelos();
+    alert("Modelo salvo!");
+}
+function carregarModelo(idx) {
+    if (!confirm("Carregar este modelo substituirá a estrutura atual. Continuar?")) return;
+    const modelo = appState.models[idx];
+    appState.structure = JSON.parse(JSON.stringify(modelo.structure));
+    salvarEstado();
+    atualizarUI();
+}
+function excluirModelo(idx) {
+    if (!confirm("Excluir modelo?")) return;
+    appState.models.splice(idx, 1);
+    localStorage.setItem(MODELS_DB_KEY, JSON.stringify(appState.models));
+    renderModelos();
+}
+
+// --- DRAG AND DROP ---
+let dragSrcEl = null;
+function handleDragStart(e, type, gIdx, cIdx = null) {
+    dragSrcEl = e.target;
+    e.target.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('type', type);
+    e.dataTransfer.setData('gIdx', gIdx);
+    if (cIdx !== null) e.dataTransfer.setData('cIdx', cIdx);
+}
+function handleDragOver(e) {
+    if (e.preventDefault) e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const target = e.target.closest('.draggable-item') || e.target.closest('.drop-target-group');
+    if (target && target !== dragSrcEl) target.classList.add('drag-over');
+    return false;
+}
+function handleDragLeave(e) {
+    const target = e.target.closest('.draggable-item') || e.target.closest('.drop-target-group');
+    if (target) target.classList.remove('drag-over');
+}
+function handleDrop(e, targetType, targetGIdx, targetCIdx = null) {
+    if (e.stopPropagation) e.stopPropagation();
+    document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
+    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+    const srcType = e.dataTransfer.getData('type');
+    const srcGIdx = parseInt(e.dataTransfer.getData('gIdx'));
+    if (srcType === 'group' && targetType === 'group') {
+        if (srcGIdx !== targetGIdx) {
+            const item = appState.structure.splice(srcGIdx, 1)[0];
+            appState.structure.splice(targetGIdx, 0, item);
+            salvarEstado(); atualizarUI();
+        }
+    }
+    if (srcType === 'col' && targetType === 'col') {
+        const srcCIdx = parseInt(e.dataTransfer.getData('cIdx'));
+        if (srcGIdx === targetGIdx && srcCIdx === targetCIdx) return;
+        const item = appState.structure[srcGIdx].cols.splice(srcCIdx, 1)[0];
+        appState.structure[targetGIdx].cols.splice(targetCIdx, 0, item);
+        salvarEstado(); atualizarUI();
+    }
+    if (srcType === 'col' && targetType === 'group') {
+        const srcCIdx = parseInt(e.dataTransfer.getData('cIdx'));
+        if (srcGIdx === targetGIdx) return;
+        const item = appState.structure[srcGIdx].cols.splice(srcCIdx, 1)[0];
+        appState.structure[targetGIdx].cols.push(item);
+        salvarEstado(); atualizarUI();
+    }
+    return false;
+}
+function renderEditorEstrutura() {
+    const container = document.getElementById('editor-estrutura-lista');
+    container.innerHTML = '';
+    appState.structure.forEach((group, gIdx) => {
+        const groupEl = document.createElement('div');
+        groupEl.className = "bg-white border border-gray-200 rounded-sm overflow-hidden drop-target-group mb-2";
+        groupEl.setAttribute('draggable', 'true');
+        groupEl.addEventListener('dragstart', (e) => handleDragStart(e, 'group', gIdx));
+        groupEl.addEventListener('dragover', handleDragOver);
+        groupEl.addEventListener('dragleave', handleDragLeave);
+        groupEl.addEventListener('drop', (e) => {
+            if (!e.target.closest('.col-item')) handleDrop(e, 'group', gIdx);
+        });
+        const headerEl = document.createElement('div');
+        headerEl.className = "bg-gray-50 p-2 flex gap-2 items-center border-b border-gray-200 cursor-grab active:cursor-grabbing";
+        headerEl.innerHTML = `
+            <i class="fas fa-grip-vertical text-gray-300 text-xs"></i>
+            <i class="fas fa-folder text-gray-400 text-xs"></i>
+            <input type="text" value="${group.title}"
+                onchange="updateGroupTitle(${gIdx}, this.value)"
+                class="bg-transparent text-xs font-bold text-gray-800 w-full focus:outline-none focus:bg-white border border-transparent focus:border-gray-300 rounded-sm px-1" placeholder="Título do Grupo">
+            <button onclick="toggleGroupGray(${gIdx})"
+                class="text-[10px] px-2 py-0.5 rounded-sm border ${group.grayTitle ? 'bg-gray-700 text-white border-gray-800' : 'bg-white text-gray-400 border-gray-200 hover:border-gray-300'}"
+                title="Pintar Título"><i class="fas fa-fill-drip"></i></button>
+            <button onclick="removerGrupo(${gIdx})" class="text-gray-400 hover:text-red-600 px-1"><i class="fas fa-trash-alt text-[10px]"></i></button>
+        `;
+        groupEl.appendChild(headerEl);
+        const bodyEl = document.createElement('div');
+        bodyEl.className = "p-2 space-y-1.5";
+        const colsContainer = document.createElement('div');
+        colsContainer.className = "space-y-1.5";
+        group.cols.forEach((col, cIdx) => {
+            const colEl = document.createElement('div');
+            colEl.className = "flex gap-1.5 items-center draggable-item col-item";
+            colEl.setAttribute('draggable', 'true');
+            colEl.addEventListener('dragstart', (e) => { e.stopPropagation(); handleDragStart(e, 'col', gIdx, cIdx); });
+            colEl.addEventListener('dragover', handleDragOver);
+            colEl.addEventListener('dragleave', handleDragLeave);
+            colEl.addEventListener('drop', (e) => { e.stopPropagation(); handleDrop(e, 'col', gIdx, cIdx); });
+            const isFixo = col.type === 'fixo';
+            const isSystem = col.type === 'system';
+            let btnClass = 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50';
+            let btnText = 'SUP';
+            if (isFixo) { btnClass = 'bg-gray-100 text-gray-800 border-gray-300 font-bold hover:bg-gray-200'; btnText = 'FIXO'; }
+            if (isSystem) { btnClass = 'bg-gray-50 text-gray-400 border-gray-100 cursor-not-allowed'; btnText = 'SIS'; }
+            colEl.innerHTML = `
+                <i class="fas fa-grip-vertical text-gray-300 text-[10px] cursor-grab active:cursor-grabbing"></i>
+                <input type="text" value="${col.label}"
+                    onchange="updateColLabel(${gIdx}, ${cIdx}, this.value)"
+                    class="flex-1 w-16 bg-white border border-gray-200 rounded-sm text-gray-700 text-[10px] px-1.5 py-0.5 focus:border-kyro-orange-500 outline-none">
+                <button onclick="toggleColHeaderGray(${gIdx}, ${cIdx})"
+                    class="text-[10px] px-1.5 py-0.5 rounded-sm border ${col.grayHeader ? 'bg-gray-600 text-white border-gray-700' : 'bg-white text-gray-400 border-gray-200 hover:bg-gray-50'}"
+                    title="Pintar Header"><i class="fas fa-heading"></i></button>
+                <button onclick="toggleColBodyGray(${gIdx}, ${cIdx})"
+                    class="text-[10px] px-1.5 py-0.5 rounded-sm border ${col.grayBody ? 'bg-gray-400 text-white border-gray-500' : 'bg-white text-gray-400 border-gray-200 hover:bg-gray-50'}"
+                    title="Pintar Coluna"><i class="fas fa-fill-drip"></i></button>
+                <button onclick="${isSystem ? '' : `toggleColType(${gIdx}, ${cIdx})`}"
+                    class="text-[9px] px-1.5 py-0.5 rounded-sm border min-w-[32px] ${btnClass}"
+                    title="Alternar Tipo">${btnText}</button>
+                <button onclick="removerColuna(${gIdx}, ${cIdx})" class="text-gray-300 hover:text-red-500 px-1"><i class="fas fa-times"></i></button>
+            `;
+            colsContainer.appendChild(colEl);
+        });
+        bodyEl.appendChild(colsContainer);
+        const addBtn = document.createElement('button');
+        addBtn.className = "w-full mt-1.5 text-[10px] text-gray-500 hover:text-gray-800 bg-gray-50 py-1 rounded-sm border border-gray-200 transition-colors";
+        addBtn.innerHTML = '+ Adicionar Coluna';
+        addBtn.onclick = () => adicionarColuna(gIdx);
+        bodyEl.appendChild(addBtn);
+        groupEl.appendChild(bodyEl);
+        container.appendChild(groupEl);
+    });
+    const slotSelect = document.getElementById('config-slot');
+    slotSelect.innerHTML = '';
+    getFlatColumns().forEach(c => {
+        if (c.type !== 'system') slotSelect.add(new Option(c.label, c.key));
+    });
+}
+
+// --- OBSERVAÇÕES / EDITOR ---
+function execCmd(command, value = null) {
+    document.execCommand(command, false, value);
+    document.getElementById('editor-obs').focus();
+    salvarObservacaoAtual();
+}
+function setVerticalAlign(align) {
+    const editor = document.getElementById('editor-obs');
+    editor.classList.remove('valign-top', 'valign-middle', 'valign-bottom');
+    if (align === 'top') editor.classList.add('valign-top');
+    if (align === 'middle') editor.classList.add('valign-middle');
+    if (align === 'bottom') editor.classList.add('valign-bottom');
+    const key = getObsKey();
+    if (!appState.observacoesConfig[key]) appState.observacoesConfig[key] = {};
+    appState.observacoesConfig[key].vAlign = align;
+    salvarEstado();
+    editor.focus();
+}
+function getObsKey() { return `${appState.ano}-${appState.mes}`; }
+function carregarObservacaoAtual() {
+    const key = getObsKey();
+    let content = appState.observacoes[key];
+    if (content === undefined) { content = DEFAULT_OBS_TEXT; appState.observacoes[key] = content; }
+    const config = appState.observacoesConfig[key] || { vAlign: 'middle' };
+    const editor = document.getElementById('editor-obs');
+    editor.innerHTML = content;
+    editor.classList.remove('valign-top', 'valign-middle', 'valign-bottom');
+    if (config.vAlign === 'top') editor.classList.add('valign-top');
+    if (config.vAlign === 'middle') editor.classList.add('valign-middle');
+    if (config.vAlign === 'bottom') editor.classList.add('valign-bottom');
+}
+function salvarObservacaoAtual() {
+    const key = getObsKey();
+    appState.observacoes[key] = document.getElementById('editor-obs').innerHTML;
+    salvarEstado();
+}
+
+// --- ESTRUTURA (edição) ---
+function updateGroupTitle(gIdx, val) { appState.structure[gIdx].title = val; salvarEstado(); atualizarUI(); }
+function toggleGroupGray(gIdx) { appState.structure[gIdx].grayTitle = !appState.structure[gIdx].grayTitle; salvarEstado(); atualizarUI(); }
+function updateColLabel(gIdx, cIdx, val) { appState.structure[gIdx].cols[cIdx].label = val; salvarEstado(); atualizarUI(); }
+function toggleColType(gIdx, cIdx) { const t = appState.structure[gIdx].cols[cIdx].type; if (t === 'system') return; appState.structure[gIdx].cols[cIdx].type = (t === 'fixo' ? 'suplente' : 'fixo'); salvarEstado(); atualizarUI(); }
+function toggleColHeaderGray(gIdx, cIdx) { appState.structure[gIdx].cols[cIdx].grayHeader = !appState.structure[gIdx].cols[cIdx].grayHeader; salvarEstado(); atualizarUI(); }
+function toggleColBodyGray(gIdx, cIdx) { appState.structure[gIdx].cols[cIdx].grayBody = !appState.structure[gIdx].cols[cIdx].grayBody; salvarEstado(); atualizarUI(); }
+function removerGrupo(gIdx) { if (!confirm('Remover grupo?')) return; appState.structure.splice(gIdx, 1); salvarEstado(); atualizarUI(); }
+function removerColuna(gIdx, cIdx) { appState.structure[gIdx].cols.splice(cIdx, 1); salvarEstado(); atualizarUI(); }
+function adicionarGrupo() { appState.structure.push({ title: "NOVO GRUPO", grayTitle: false, cols: [] }); salvarEstado(); atualizarUI(); }
+function adicionarColuna(gIdx) { const key = 'col_' + Date.now() + Math.floor(Math.random() * 1000); appState.structure[gIdx].cols.push({ key: key, label: "Nova", type: 'suplente', grayHeader: false, grayBody: false }); salvarEstado(); atualizarUI(); }
+
+// --- GERAÇÃO DE ESCALA ---
+function gerarEscala(embaralhar) {
+    const mes = appState.mes; const ano = appState.ano; const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+    const feriadosStr = masterData.feriados.map(f => f.data);
+    const pool = getFuncionariosEscala();
+    if (pool.length === 0) return alert("Sem funcionários!");
+    const flatCols = getFlatColumns();
+    const slotsKeys = flatCols.filter(c => c.type !== 'system').map(c => c.key);
+    const stats = {};
+    const colStats = {};
+    pool.forEach(f => {
+        const n = f.apelido || f.nome;
+        stats[n] = { total: 0 };
+        colStats[n] = {};
+        slotsKeys.forEach(k => colStats[n][k] = 0);
+    });
+    const novaEscala = [];
+    let senhaIdx = 0;
+    const poolSenha = masterData.funcionarios.filter(f => f.tipo === 'escala' && f.categoria === 'Funcionário da Senha');
+    let randomSeed = 12345;
+    const pseudoRandom = () => { randomSeed = (randomSeed * 9301 + 49297) % 233280; return randomSeed / 233280; };
+    const getRandom = () => embaralhar ? Math.random() : pseudoRandom();
+    for (let d = 1; d <= diasNoMes; d++) {
+        const dataObj = new Date(ano, mes, d);
+        const diaSemana = dataObj.getDay();
+        const dataISO = dataObj.toISOString().split('T')[0];
+        if (diaSemana === 0 || diaSemana === 6 || feriadosStr.includes(dataISO)) continue;
+        const linha = { data: dataObj, diaSemana: dataObj, senha: '' };
+        slotsKeys.forEach(k => linha[k] = '');
+        if (poolSenha.length > 0) {
+            linha.senha = (poolSenha[senhaIdx].apelido || poolSenha[senhaIdx].nome);
+            senhaIdx = (senhaIdx + 1) % poolSenha.length;
+        }
+        const escaladosNoDia = new Set();
+        const slotsOcupados = new Set();
+        appState.regrasFixas.forEach(r => {
+            if (slotsKeys.includes(r.slot)) {
+                const funcObj = masterData.funcionarios.find(f => (f.apelido || f.nome) === r.func);
+                let emFerias = false;
+                if (funcObj) {
+                    emFerias = masterData.ferias.some(fer => {
+                        if (fer.funcionario !== funcObj.nome) return false;
+                        const ini = new Date(fer.inicio + 'T00:00:00');
+                        const fim = new Date(fer.fim + 'T00:00:00');
+                        return dataObj >= ini && dataObj <= fim;
+                    });
+                }
+                slotsOcupados.add(r.slot);
+                if (!emFerias) {
+                    linha[r.slot] = r.func;
+                    escaladosNoDia.add(r.func);
+                    atualizarStats(r.func, r.slot, stats, colStats);
+                } else {
+                    linha[r.slot] = '';
+                }
+            }
+        });
+        const slotsLivres = slotsKeys.filter(s => !slotsOcupados.has(s));
+        const diaAnterior = novaEscala.length > 0 ? novaEscala[novaEscala.length - 1] : null;
+        const candidatosDisponiveis = pool.filter(f => {
+            const n = f.apelido || f.nome;
+            if (escaladosNoDia.has(n)) return false;
+            const emFerias = masterData.ferias.some(fer => {
+                if (fer.funcionario !== f.nome) return false;
+                const ini = new Date(fer.inicio + 'T00:00:00');
+                const fim = new Date(fer.fim + 'T00:00:00');
+                return dataObj >= ini && dataObj <= fim;
+            });
+            return !emFerias;
+        });
+        const opcoes = [];
+        candidatosDisponiveis.forEach(cand => {
+            const nome = cand.apelido || cand.nome;
+            slotsLivres.forEach(slot => {
+                const countSlot = colStats[nome][slot] || 0;
+                const countTotal = stats[nome].total || 0;
+                let penalty = 0;
+                if (diaAnterior && diaAnterior[slot] === nome) penalty = 100000;
+                const score = penalty + (countSlot * 1000) + countTotal;
+                opcoes.push({ nome: nome, slot: slot, score: score, rand: getRandom() });
+            });
+        });
+        opcoes.sort((a, b) => {
+            if (a.score !== b.score) return a.score - b.score;
+            return a.rand - b.rand;
+        });
+        const assignedSlots = new Set();
+        const assignedPeople = new Set();
+        for (const op of opcoes) {
+            if (assignedSlots.has(op.slot)) continue;
+            if (assignedPeople.has(op.nome)) continue;
+            linha[op.slot] = op.nome;
+            assignedSlots.add(op.slot);
+            assignedPeople.add(op.nome);
+            atualizarStats(op.nome, op.slot, stats, colStats);
+            if (assignedSlots.size === slotsLivres.length || assignedPeople.size === candidatosDisponiveis.length) break;
+        }
+        novaEscala.push(linha);
+    }
+    appState.escala = novaEscala;
+    salvarEstado();
+    atualizarUI();
+}
+function atualizarStats(nome, slot, stats, colStats) {
+    if (!stats[nome]) return;
+    stats[nome].total++;
+    if (colStats[nome]) colStats[nome][slot]++;
+}
+function atualizarUI() { renderEditorEstrutura(); renderModelos(); renderTabela(); renderResumo(); renderRegras(); carregarObservacaoAtual(); }
+
+// --- TABELA ---
+function renderTabela() {
+    const thead = document.getElementById('tabela-head'); let h1 = `<tr>`;
+    appState.structure.forEach(g => {
+        if (g.cols.length > 0) {
+            let bgClass = "bg-gray-100 text-gray-700";
+            if (g.grayTitle) bgClass = "bg-custom-gray-group";
+            h1 += `<th class="${bgClass} text-center text-[10px] font-bold" colspan="${g.cols.length}">${g.title}</th>`;
+        }
+    });
+    h1 += `</tr>`;
+    let h2 = `<tr class="text-[10px]">`;
+    appState.structure.forEach(g => {
+        g.cols.forEach((c, idx) => {
+            let color = 'text-gray-600 font-medium';
+            if (c.type === 'fixo') color = 'text-gray-900 font-bold';
+            const headerClass = c.grayHeader ? 'bg-custom-gray-header' : '';
+            h2 += `<th class="top-[38px] z-[9] ${color} ${headerClass}">${c.label}</th>`;
+        });
+    });
+    h2 += `</tr>`;
+    thead.innerHTML = h1 + h2;
+    const tbody = document.getElementById('tabela-escala'); tbody.innerHTML = '';
+    const dias = appState.escala.filter(l => l.data.getMonth() === appState.mes && l.data.getFullYear() === appState.ano);
+    const hoje = new Date();
+    document.getElementById('total-dias-badge').innerText = `${dias.length} DIAS`;
+    dias.forEach((linha, idx) => {
+        const tr = document.createElement('tr');
+        if (linha.data.getDate() === hoje.getDate() && linha.data.getMonth() === hoje.getMonth()) tr.classList.add('dia-hoje');
+        let html = ``;
+        appState.structure.forEach(g => {
+            g.cols.forEach((c, cIdx) => {
+                let val = linha[c.key] || '';
+                if (c.key === 'dataLabel' && !val) val = linha.data.toLocaleDateString('pt-BR');
+                if (c.key === 'semLabel' && !val) val = linha.diaSemana.toLocaleDateString('pt-BR', { weekday: 'short' }).toUpperCase();
+                if (c.key === 'senha' && !val) val = linha.senha || '-';
+                const isLocked = appState.regrasFixas.some(r => r.func === val && r.slot === c.key);
+                const bgDest = appState.destaques[val] ? `style="background-color: ${appState.destaques[val]} !important"` : '';
+                const lockedClass = isLocked ? 'celula-travada' : '';
+                let extraClass = '';
+                if (c.type === 'system') extraClass += ' font-semibold bg-gray-50 text-gray-500';
+                if (c.grayBody) extraClass += ' bg-custom-gray';
+                html += `<td class="editable ${lockedClass} ${extraClass}" ${bgDest} data-idx="${idx}" data-key="${c.key}">${val || '<span class="text-gray-300">-</span>'}</td>`;
+            });
+        });
+        tr.innerHTML = html;
+        tbody.appendChild(tr);
+    });
+}
+function getFlatColumns() {
+    const cols = [];
+    if (appState.structure) { appState.structure.forEach(g => { if (g.cols) g.cols.forEach(c => cols.push(c)); }); }
+    return cols;
+}
+
+// --- RESUMO ---
+function renderResumo() {
+    const headerRow = document.getElementById('resumo-header');
+    const tbody = document.getElementById('lista-resumo');
+    if (!headerRow || !tbody) return;
+    headerRow.innerHTML = ''; tbody.innerHTML = '';
+    const flatCols = getFlatColumns().filter(c => c.type !== 'system');
+    const colsFixos = flatCols.filter(c => c.type === 'fixo');
+    const colsSuplentes = flatCols.filter(c => c.type === 'suplente');
+    const colsOutros = flatCols.filter(c => c.type !== 'fixo' && c.type !== 'suplente');
+    const sortedCols = [...colsFixos, ...colsSuplentes, ...colsOutros];
+    let headerHTML = `<th class="resumo-col-nome font-semibold text-gray-700 p-1.5">NOME</th>`;
+    sortedCols.forEach(c => {
+        let label = c.label || '';
+        let shortLabel = label.substring(0, 3).toUpperCase();
+        let colorClass = 'text-gray-500 bg-white';
+        if (c.type === 'fixo') colorClass = 'text-gray-900 bg-gray-100';
+        header
+    </script>
+</body>
+</html>

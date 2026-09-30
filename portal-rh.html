@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prefeitura de Limeira - ERP Municipal | Gestão de Pessoal</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style>
+:root{--azul:#0055a4;--azul-escuro:#003d78;--azul-medio:#1e6fd9;--azul-claro:#e8f0fb;--azul-suave:#d4e3f7;--branco:#fff;--cinza:#f2f5f9;--texto:#1f2a37;--texto-suave:#5b6b7c;--verde:#1f9d55;--verde-claro:#e6f6ee;--laranja:#d9822b;--laranja-claro:#fdf3e3;--vermelho:#d64545;--sombra:0 2px 10px rgba(0,85,164,.08);--raio:10px}
+*{margin:0;padding:0;box-sizing:border-box}html,body{height:100%}
+body{font-family:'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:var(--cinza);color:var(--texto);font-size:12px;line-height:1.4;min-height:100vh;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:210px;flex-shrink:0;background:var(--branco);border-right:1px solid #e3eaf2;padding:10px;position:sticky;top:0;height:100vh;overflow-y:auto;transition:transform .3s ease}
+.sidebar::-webkit-scrollbar{width:6px}.sidebar::-webkit-scrollbar-thumb{background:var(--azul-suave);border-radius:3px}
+.calendar{background:var(--cinza);border:1px solid #e3eaf2;border-radius:var(--raio);padding:8px;box-shadow:var(--sombra);margin-bottom:12px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.cal-head button{background:none;border:none;color:var(--azul);font-size:14px;cursor:pointer;padding:2px 6px;border-radius:6px}.cal-head button:hover{background:var(--azul-claro)}
+.cal-title{font-size:12px;font-weight:700;color:var(--azul-escuro)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.cal-grid .dow{font-size:9px;font-weight:700;color:var(--texto-suave);padding:2px 0}
+.cal-grid .day{font-size:10px;padding:3px 0;border-radius:50%;color:var(--texto)}
+.cal-grid .day.today{background:var(--azul);color:#fff;font-weight:700}
+.cal-grid .day.event{background:var(--azul-claro);color:var(--azul);font-weight:600;border:1px solid var(--azul-suave)}
+.cal-grid .day.other{color:#c0c8d1}
+.cal-legend{margin-top:6px;font-size:9px;color:var(--texto-suave);display:flex;gap:8px;flex-wrap:wrap}
+.cal-legend span{display:inline-flex;align-items:center;gap:4px}.cal-legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.mod-title{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--texto-suave);font-weight:700;padding:0 4px 8px}
+.mod-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mod-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:6px 4px;border-radius:10px;transition:background .2s}
+.mod-item:hover{background:var(--azul-claro)}
+.mod-item .mi-ico{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;transition:transform .2s,box-shadow .2s}
+.mod-item:hover .mi-ico{transform:scale(1.08);box-shadow:0 4px 12px rgba(0,85,164,.25)}
+.mod-item .mi-label{font-size:9px;color:var(--texto-suave);text-align:center;line-height:1.2}
+.mod-item.active .mi-label{color:var(--azul);font-weight:600}.mod-item.active .mi-ico{box-shadow:0 0 0 3px var(--azul-suave)}
+.main{flex:1;padding:14px 16px 26px;min-width:0;height:100vh;overflow-y:auto}
+.view{display:none;animation:fadeIn .3s ease}.view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px}
+.page-head h1{font-size:16px;color:var(--azul-escuro);font-weight:700}.page-head p{color:var(--texto-suave);font-size:11.5px;margin-top:2px}
+.panel{background:var(--branco);border:1px solid #e3eaf2;border-radius:var(--raio);box-shadow:var(--sombra);padding:12px;margin-bottom:14px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.panel-head h3{font-size:13px;color:var(--azul-escuro);font-weight:700}.panel-head .sub{font-size:11px;color:var(--texto-suave)}
+.func-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.func-card{background:var(--branco);border:1px solid #e3eaf2;border-radius:var(--raio);padding:11px 13px;box-shadow:var(--sombra);display:flex;align-items:center;gap:12px;transition:transform .2s,box-shadow .2s,border-color .2s;cursor:pointer;min-height:52px}
+.func-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,85,164,.15);border-color:var(--azul)}
+.func-avatar{width:42px;height:42px;border-radius:50%;color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid rgba(255,255,255,.7)}
+.func-info{flex:1;min-width:0}
+.func-info .fn{font-size:12.5px;font-weight:700;color:var(--azul-escuro);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.func-info .fm{font-size:11px;color:var(--texto-suave);margin-top:2px;line-height:1.4}
+#view-ponto.active,#view-ferias.active,#view-histferias.active{display:flex;flex-direction:column;height:100%;overflow:hidden}
+#view-ponto .page-head,#view-ferias .page-head,#view-histferias .page-head{flex-shrink:0}
+#view-ponto .panel,#view-ferias .panel,#view-histferias .panel{flex:1;min-height:0;display:flex;flex-direction:column;margin-bottom:0}
+/* PONTO */
+.ponto-layout{flex:1;min-height:0;display:flex;gap:12px;align-items:stretch}
+.ponto-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.ponto-filtro{width:220px;flex-shrink:0;background:var(--branco);border:1px solid #e3eaf2;border-radius:var(--raio);padding:12px;box-shadow:var(--sombra);overflow-y:auto}
+.ponto-filtro h3{font-size:12px;color:var(--azul-escuro);margin-bottom:10px}
+#gantt-ponto{flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid #e3eaf2;border-radius:var(--raio);overflow:hidden;background:var(--branco)}
+.tl{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden}
+.tl-head{display:flex;align-items:stretch;border-bottom:2px solid var(--azul-suave);background:var(--azul-claro);flex-shrink:0}
+.tl-corner{width:58px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--azul-escuro);color:#fff;font-size:8.5px;font-weight:700}
+.tl-func{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:3px 2px;border-left:1px solid var(--azul-suave);cursor:pointer}
+.tl-func:hover{background:var(--azul-suave)}
+.tl-func .tf-av{width:24px;height:24px;border-radius:50%;background:#fff;font-size:8.5px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.tl-func .tf-nm{font-size:7px;color:var(--azul-escuro);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.tl-body{flex:1;min-height:0;display:flex;overflow:hidden}
+.tl-times{width:58px;flex-shrink:0;position:relative;background:var(--cinza);border-right:1px solid #e3eaf2}
+.tl-time{position:absolute;right:3px;transform:translateY(-50%);font-size:7px;line-height:1;color:var(--texto-suave);font-weight:600}
+.tl-track-wrap{flex:1;min-width:0;min-height:0;position:relative;display:flex}
+.tl-track{flex:1;min-width:0;min-height:0;position:relative;border-left:1px solid #eef2f8}
+.tl-line{position:absolute;left:0;right:0;border-top:1px dashed #eef2f8;pointer-events:none}
+.tl-bar{position:absolute;left:14%;right:14%;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:8px;font-weight:700;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.25);overflow:hidden;white-space:nowrap;z-index:2}
+.tl-bar:hover{filter:brightness(1.1)}
+.tl-bar .tb-av{width:14px;height:14px;border-radius:50%;background:#fff;font-size:6px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:3px}
+/* FÉRIAS */
+.fc{width:100%;height:100%;display:flex;flex-direction:column;overflow:auto}
+.fc-head{display:flex;align-items:stretch;flex-shrink:0;border-bottom:1px solid var(--azul-suave);background:var(--azul-claro)}
+.fc-label{width:70px;flex-shrink:0;background:var(--azul-escuro);color:#fff;font-size:8.5px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:2px;overflow:hidden}
+.fc-dow{flex:1;min-width:0;text-align:center;font-size:7px;color:var(--texto-suave);font-weight:700;padding:2px 0;border-left:1px solid #eef2f8;overflow:hidden}
+.fc-weeks{flex:1;display:flex;flex-direction:column;min-height:0}
+.fc-week{flex:1 1 0;min-height:28px;display:flex;position:relative;border-bottom:1px solid #eef2f8}
+.fc-week:last-child{border-bottom:none}
+.fc-mlabel{width:70px;flex-shrink:0;display:flex;align-items:flex-start;justify-content:center;font-size:8.5px;font-weight:700;color:var(--azul-escuro);background:var(--azul-claro);border-right:1px solid var(--azul-suave);border-bottom:1px solid #eef2f8;overflow:hidden;padding-top:5px}
+.fc-mlabel-empty{background:var(--branco);color:transparent}
+.fc-cells{flex:1;min-width:0;position:relative;display:flex}
+.fc-cell{flex:1;min-width:0;position:relative;border-left:1px solid #eef2f8;background:#fafcff;display:flex;align-items:flex-start;justify-content:center;font-size:7.5px;color:var(--texto-suave);overflow:hidden;padding-top:3px}
+.fc-cell.other{background:#f5f8fc;color:#c0c8d1}
+.fc-cell.dom,.fc-cell.sab{background:#f3f6fa}
+.fc-bar{position:absolute;top:50%;transform:translateY(-50%);height:22px;background:#52616e;border-radius:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:7.5px;font-weight:700;z-index:2;box-shadow:0 1px 2px rgba(0,0,0,.18);white-space:nowrap;overflow:hidden;cursor:pointer;padding:0 3px;box-sizing:border-box}
+.fc-bar.fc-l{border-top-left-radius:8px;border-bottom-left-radius:8px}
+.fc-bar.fc-r{border-top-right-radius:8px;border-bottom-right-radius:8px}
+.fc-bar:hover{filter:brightness(1.12)}
+.fc-avatar{width:15px;height:15px;border-radius:50%;background:#fff;font-size:6.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:3px;color:#3a464f}
+#gantt-ferias{flex:1;min-height:0;overflow:hidden}
+/* HISTÓRICO DE FÉRIAS */
+.hfc{width:100%;height:100%;display:flex;flex-direction:column;gap:6px;overflow:auto}
+.hfc-head{display:flex;align-items:stretch;flex-shrink:0}
+.hfc-label{width:140px;flex-shrink:0;display:flex;align-items:center;gap:6px;padding:4px 6px;background:var(--azul-claro);border:1px solid var(--azul-suave);border-radius:8px;font-size:9.5px;font-weight:700;color:var(--azul-escuro);overflow:hidden;white-space:nowrap}
+.hfc-label .ha{width:19px;height:19px;border-radius:50%;font-size:7px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hfc-grid{flex:1;display:flex;min-width:0}
+.hfc-mon{flex:1 1 0;min-width:0;text-align:center;font-size:6.5px;color:var(--texto-suave);border-left:1px solid #eef2f8;padding:2px 0;background:var(--azul-claro);overflow:hidden}
+.hfc-row{display:flex;align-items:stretch}
+.hfc-row .hfc-track{flex:1;position:relative;min-width:0;height:20px;background:#fafcff;border:1px solid #eef2f8;border-radius:8px}
+.hfc-row .hfc-track .hfc-bar{position:absolute;top:50%;transform:translateY(-50%);height:12px;border-radius:6px;font-size:6.5px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 3px;cursor:pointer;overflow:hidden;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+#gantt-histferias{flex:1;min-height:0;overflow:hidden}
+.ferias-nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ferias-nav .nav-btn{background:var(--azul-claro);border:1px solid var(--azul-suave);color:var(--azul);border-radius:7px;width:28px;height:28px;font-size:13px;cursor:pointer;font-weight:700;line-height:1}
+.ferias-nav .nav-btn:hover{background:var(--azul);color:#fff}
+.ferias-nav .nav-label{font-size:12px;font-weight:700;color:var(--azul-escuro);min-width:180px;text-align:center}
+/* ESCALA */
+.esc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.esc-card{background:var(--branco);border:1px solid #e3eaf2;border-radius:var(--raio);padding:11px;box-shadow:var(--sombra);cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;border-left:4px solid var(--azul)}
+.esc-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,85,164,.15);border-color:var(--azul)}
+.esc-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.esc-avatar{width:40px;height:40px;border-radius:50%;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.7);flex-shrink:0}
+.esc-nome{font-size:12.5px;font-weight:700;color:var(--azul-escuro);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.esc-apelido{font-size:10px;color:var(--texto-suave);margin-top:2px}
+.esc-chip{display:inline-block;font-size:9px;font-weight:600;padding:2px 8px;border-radius:20px;margin-top:3px;margin-right:4px}
+.esc-chip.senha{background:var(--azul-claro);color:var(--azul)}
+.esc-chip.guiche{background:var(--laranja-claro);color:var(--laranja)}
+.esc-chip.fixo{background:var(--verde-claro);color:var(--verde)}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:12px}
+.stat{background:var(--branco);border:1px solid #e3eaf2;border-radius:var(--raio);padding:11px;text-align:center;box-shadow:var(--sombra)}
+.stat .s-num{font-size:20px;font-weight:800;color:var(--azul)}.stat .s-label{font-size:10.5px;color:var(--texto-suave);font-weight:600}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:540px}
+thead th{background:var(--azul-claro);color:var(--azul-escuro);text-align:left;padding:7px 10px;font-size:10px;text-transform:uppercase;letter-spacing:.04em;font-weight:700;border-bottom:2px solid var(--azul-suave);white-space:nowrap}
+tbody td{padding:7px 10px;border-bottom:1px solid #eef2f8;font-size:11.5px}
+tbody tr:hover{background:var(--azul-claro)}
+.row-actions{display:flex;gap:6px}
+.row-actions button{background:none;border:none;cursor:pointer;font-size:13px;padding:3px;border-radius:6px}
+.row-actions button:hover{background:var(--azul-suave)}
+.row-actions button.danger:hover{background:#fbe3e3}
+.check-cell{text-align:center}.check-cell input{width:15px;height:15px;accent-color:var(--azul);cursor:pointer}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
+.badge.fixo{background:var(--azul-claro);color:var(--azul)}.badge.suplente{background:var(--laranja-claro);color:var(--laranja)}
+.badge.ok{background:var(--verde-claro);color:var(--verde)}.badge.warn{background:var(--laranja-claro);color:var(--laranja)}.badge.tipo{background:#eef2f8;color:var(--texto-suave)}
+.badge.senha{background:var(--azul-claro);color:var(--azul)}.badge.guiche{background:var(--laranja-claro);color:var(--laranja)}
+/* DROPDOWN */
+.dd{position:relative;display:inline-block}
+.dd-btn{display:inline-flex;align-items:center;gap:6px;background:var(--azul-escuro);color:#fff;border:none;border-radius:7px;padding:7px 12px;font-size:11.5px;font-weight:600;cursor:pointer}
+.dd-btn:hover{background:#002c58}
+.dd-content{display:none;position:absolute;right:0;top:calc(100% + 4px);background:var(--branco);border:1px solid #e3eaf2;border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.18);min-width:230px;z-index:90;padding:5px;flex-direction:column}
+.dd:hover .dd-content{display:flex}
+.dd-content button{text-align:left;border:none;background:none;padding:8px 10px;border-radius:7px;font-size:11.5px;color:var(--texto);cursor:pointer;display:flex;align-items:center;gap:8px;width:100%}
+.dd-content button:hover{background:var(--azul-claro);color:var(--azul)}
+.dd-content .dd-danger:hover{background:#fbe3e3;color:var(--vermelho)}
+.dd-div{margin:4px 0;border-top:1px solid #eef2f8}
+#lote-bar{display:none;align-items:center;gap:10px;background:var(--laranja-claro);border:1px solid #f2dfc3;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:11.5px;font-weight:600;color:var(--laranja)}
+#lote-bar.show{display:flex}
+/* PERFIL */
+.perfil-overlay{position:fixed;inset:0;z-index:200;background:var(--cinza);display:none;flex-direction:column}
+.perfil-overlay.open{display:flex;animation:fadeIn .25s ease}
+.perfil-top{height:48px;flex-shrink:0;background:var(--azul-escuro);color:#fff;display:flex;align-items:center;gap:12px;padding:0 16px}
+.perfil-top .pt-title{font-size:14px;font-weight:700}
+.perfil-top .pt-close{margin-left:auto;background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1}
+.perfil-body{flex:1;min-height:0;display:flex;overflow:hidden}
+.perfil-left{width:270px;flex-shrink:0;background:var(--branco);border-right:1px solid #e3eaf2;display:flex;flex-direction:column;overflow-y:auto}
+.pf-profile{padding:20px 16px;text-align:center;border-bottom:1px solid #eef2f8}
+.pf-avatar{width:76px;height:76px;border-radius:50%;color:#fff;font-size:27px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;border:3px solid rgba(255,255,255,.7);box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.pf-nome{font-size:16px;font-weight:700;color:var(--azul-escuro)}
+.pf-cargo{font-size:11.5px;color:var(--texto-suave);margin-top:2px}
+.pf-dep{display:inline-block;margin-top:10px;background:var(--azul-claro);color:var(--azul);font-size:10.5px;font-weight:600;padding:5px 12px;border-radius:20px}
+.pf-nav{padding:12px 10px;display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.pf-nav-item{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 4px;border:1px solid #e3eaf2;border-radius:12px;cursor:pointer;background:var(--branco);transition:transform .15s,box-shadow .15s,border-color .15s}
+.pf-nav-item:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,85,164,.15);border-color:var(--azul)}
+.pf-nav-item.active{border-color:var(--azul);box-shadow:0 0 0 2px var(--azul-suave)}
+.pf-nav-item .pni-ico{width:40px;height:40px;border-radius:50%;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center}
+.pf-nav-item .pni-label{font-size:9px;color:var(--texto-suave);font-weight:600;text-align:center}
+.perfil-right{flex:1;min-width:0;padding:14px 16px;overflow-y:auto}
+.pf-secao{margin-bottom:18px}
+.pf-secao-titulo{font-size:12.5px;font-weight:700;color:var(--azul-escuro);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.pf-secao-titulo .st-ico{width:25px;height:25px;border-radius:50%;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pf-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.pf-card{background:var(--branco);border:1px solid #e3eaf2;border-radius:var(--raio);box-shadow:var(--sombra);padding:13px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;min-height:78px}
+.pf-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,85,164,.18);border-color:var(--azul)}
+.pf-card .pc-ico{width:46px;height:46px;border-radius:14px;color:#fff;font-size:21px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pf-card .pc-txt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.pf-card .pc-label{font-size:12px;font-weight:700;color:var(--azul-escuro)}
+.pf-card .pc-sub{font-size:10px;color:var(--texto-suave)}
+.pf-empty{text-align:center;color:var(--texto-suave);padding:28px 10px;font-size:11.5px}
+.pf-empty .e-ico{font-size:30px;display:block;margin-bottom:8px;opacity:.5}
+.pf-list-item{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;border:1px solid #eef2f8;border-radius:9px;margin-bottom:8px;background:var(--cinza);cursor:pointer}
+.pf-list-item .pli-main{font-size:11.5px;font-weight:600;color:var(--azul-escuro)}
+.pf-list-item .pli-sub{font-size:10px;color:var(--texto-suave);margin-top:1px}
+.alert-info{background:var(--azul-claro);border:1px solid var(--azul-suave);border-radius:10px;padding:11px 13px;font-size:11.5px;color:var(--azul-escuro);margin-bottom:12px}
+.alert-info b{display:block;font-size:12.5px;margin-bottom:4px}
+.stats-sum{display:flex;gap:22px;flex-wrap:wrap;margin-top:8px}
+.stats-sum .ss-item{text-align:center}
+.stats-sum .ss-num{font-size:19px;font-weight:800;color:var(--azul)}
+.stats-sum .ss-label{font-size:10px;color:var(--texto-suave);font-weight:600}
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--azul);color:#fff;border:none;border-radius:7px;padding:7px 12px;font-size:11.5px;font-weight:600;cursor:pointer;transition:background .2s,transform .1s,box-shadow .2s}
+.btn:hover{background:var(--azul-escuro);box-shadow:0 4px 12px rgba(0,85,164,.3)}.btn:active{transform:scale(.97)}
+.btn.btn-danger{background:var(--vermelho)}.btn.btn-danger:hover{background:#b33a3a}
+.btn.btn-ghost{background:transparent;color:var(--azul);border:1px solid var(--azul)}.btn.btn-ghost:hover{background:var(--azul-claro)}
+.btn.btn-green{background:var(--verde)}.btn.btn-green:hover{background:#157a42}
+.btn.btn-orange{background:var(--laranja)}.btn.btn-orange:hover{background:#b8661c}
+.btn.btn-small{padding:4px 9px;font-size:10.5px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,61,120,.5);z-index:300;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
+.modal-overlay.open{display:flex;animation:fadeIn .25s ease}
+.modal{background:var(--branco);border-radius:14px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,.25);animation:pop .25s ease}
+.modal.largo{max-width:960px}
+@keyframes pop{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:none}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #eef2f8}
+.modal-head h3{font-size:14px;color:var(--azul-escuro)}
+.modal-close{background:none;border:none;font-size:20px;color:var(--texto-suave);cursor:pointer;line-height:1}
+.modal-body{padding:14px 16px}
+.modal-foot{padding:10px 16px;border-top:1px solid #eef2f8;display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.field{margin-bottom:11px}
+.field label{display:block;font-size:10.5px;font-weight:600;color:var(--texto-suave);margin-bottom:4px}
+.field input,.field select,.field textarea{width:100%;padding:7px 10px;border:1px solid #d3e2f5;border-radius:7px;font-size:12.5px;color:var(--texto);background:#fff}
+.field input:focus,.field select:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(0,85,164,.15)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field-check{display:flex;align-items:center;gap:7px;font-size:11.5px;cursor:pointer;margin-top:4px}
+.field-check input{width:16px;height:16px;accent-color:var(--azul);cursor:pointer}
+.empty{text-align:center;color:var(--texto-suave);padding:22px 10px;font-size:11.5px}
+.empty .e-ico{font-size:28px;display:block;margin-bottom:6px;opacity:.5}
+.campos-ponto{background:var(--cinza);border:1px solid #e3eaf2;border-radius:9px;padding:10px 12px;margin-bottom:11px}
+.campos-ponto .cp-title{font-size:10px;font-weight:700;color:var(--azul-escuro);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+@media(max-width:1020px){.pf-cards{grid-template-columns:1fr}.main{padding:10px 10px 18px}.sidebar{width:190px}}
+@media(max-width:900px){.sidebar{transform:translateX(-100%);position:fixed;z-index:55;background:var(--branco);box-shadow:0 0 40px rgba(0,0,0,.2)}.sidebar.open{transform:translateX(0)}.ponto-layout{flex-direction:column;height:auto}.ponto-filtro{width:100%}.perfil-left{width:100%;max-height:40vh;border-right:none;border-bottom:1px solid #e3eaf2}.perfil-body{flex-direction:column}}
+@media(max-width:720px){.panel{padding:9px}.page-head h1{font-size:14px}.func-card{min-height:44px}.func-avatar{width:34px;height:34px;font-size:12px}}
+@media(max-width:520px){.field-row{grid-template-columns:1fr}.func-grid{grid-template-columns:1fr}.fc-mlabel{width:48px;font-size:7px}.fc-label{width:48px}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+<div class="calendar">
+<div class="cal-head"><button onclick="calMudar(-1)">❮</button><span class="cal-title" id="cal-title">-</span><button onclick="calMudar(1)">❯</button></div>
+<div class="cal-grid" id="cal-grid"></div>
+<div class="cal-legend"><span><i style="background:var(--azul)"></i> Hoje</span><span><i style="background:var(--azul-claro);border:1px solid var(--azul-suave)"></i> Evento</span></div>
+</div>
+<div class="mod-title">Módulos do Sistema</div>
+<div class="mod-grid">
+<div class="mod-item active" data-view="home" onclick="go('home')"><div class="mi-ico" style="background:#0055a4">🏠</div><div class="mi-label">Visão Geral</div></div>
+<div class="mod-item" data-view="funcionarios" onclick="go('funcionarios')"><div class="mi-ico" style="background:#1e6fd9">👥</div><div class="mi-label">Funcionários</div></div>
+<div class="mod-item" data-view="ponto" onclick="go('ponto')"><div class="mi-ico" style="background:#2f9e6e">🕐</div><div class="mi-label">Ponto</div></div>
+<div class="mod-item" data-view="pontos" onclick="go('pontos')"><div class="mi-ico" style="background:#3aa0c9">💾</div><div class="mi-label">Pontos Salvos</div></div>
+<div class="mod-item" data-view="escala" onclick="go('escala')"><div class="mi-ico" style="background:#7a5cc4">📅</div><div class="mi-label">Escala</div></div>
+<div class="mod-item" data-view="escalas" onclick="go('escalas')"><div class="mi-ico" style="background:#d98a2b">🗂️</div><div class="mi-label">Escalas Salvas</div></div>
+<div class="mod-item" data-view="histescala" onclick="go('histescala')"><div class="mi-ico" style="background:#b7791f">📊</div><div class="mi-label">Hist. Escala</div></div>
+<div class="mod-item" data-view="ferias" onclick="go('ferias')"><div class="mi-ico" style="background:#e05a6a">🏖️</div><div class="mi-label">Férias</div></div>
+<div class="mod-item" data-view="histferias" onclick="go('histferias')"><div class="mi-ico" style="background:#c94f3a">📋</div><div class="mi-label">Hist. Férias</div></div>
+<div class="mod-item" data-view="feriados" onclick="go('feriados')"><div class="mi-ico" style="background:#1e9e8e">🎉</div><div class="mi-label">Feriados</div></div>
+</div>
+</aside>
+<main class="main">
+<section class="view active" id="view-home">
+<div class="page-head"><div><h1>Visão Geral</h1><p id="saudacao">Bem-vindo(a) ao ERP Municipal. Clique em um funcionário para abrir o perfil.</p></div></div>
+<div class="func-grid" id="func-grid"></div>
+</section>
+<section class="view" id="view-funcionarios">
+<div class="page-head"><div><h1>Funcionários</h1><p>Cadastro com tipo de contrato</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" onclick="novaFuncionario()">➕ Incluir</button>
+<div class="dd"><button class="dd-btn">Outras Ações ▾</button><div class="dd-content">
+<button onclick="abrirCargoCadastro()">🏷️ Criar cargo</button>
+<button onclick="cardEditarCargo()">✏️ Editar cargo</button>
+<button onclick="abrirExcluirCargo()">🗑️ Excluir cargo</button>
+<div class="dd-div"></div>
+<button onclick="abrirDepCadastro()">🏢 Criar departamento</button>
+<button onclick="cardEditarDep()">✏️ Editar departamento</button>
+<button onclick="abrirExcluirDep()">🗑️ Excluir departamento</button>
+<div class="dd-div"></div>
+<button onclick="abrirRemanejar()">🔁 Remanejar</button>
+<button class="dd-danger" onclick="apagarEmLote()">🗑️ Apagar em lote</button>
+</div></div></div></div>
+<div id="lote-bar"><span id="lote-info">0 selecionado(s)</span><button class="btn btn-small btn-danger" onclick="excluirLoteSelecionados()">🗑️ Excluir selecionados</button><button class="btn btn-small btn-ghost" onclick="cancelarLote()">Cancelar</button></div>
+<div class="panel"><div class="table-wrap"><table><thead><tr id="tbl-func-head"><th>Nome Completo</th><th>Matrícula</th><th>Cargo</th><th>Departamento</th><th>Contrato</th><th>Ações</th></tr></thead><tbody id="tbl-funcionarios"></tbody></table></div></div>
+</section>
+<section class="view" id="view-ponto">
+<div class="page-head"><div><h1>Ponto</h1><p>Linha do tempo vertical: expediente de cada funcionário (06:00 - 18:00)</p></div><button class="btn" onclick="novoPonto()">➕ Incluir</button></div>
+<div class="ponto-layout"><div class="ponto-main"><div id="gantt-ponto"></div></div>
+<div class="ponto-filtro"><h3>Filtros</h3>
+<div class="field"><label>Funcionário</label><input id="ponto-busca" placeholder="Buscar por nome..." oninput="renderPonto()"></div>
+<button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="renderPonto()">🔄 Atualizar</button>
+<div style="margin-top:14px;font-size:11px;color:var(--texto-suave)">Cada barra é o expediente único do funcionário, do primeiro ao último horário cadastrado.</div></div></div>
+</section>
+<section class="view" id="view-pontos">
+<div class="page-head"><div><h1>Pontos Salvos</h1><p>Expedientes cadastrados (um por funcionário): visualizar, editar ou excluir</p></div><button class="btn" onclick="novoPonto()">➕ Incluir</button></div>
+<div class="stat-grid" id="stats-pontos"></div>
+<div class="panel"><div class="table-wrap"><table><thead><tr><th>Funcionário</th><th>Contrato</th><th>Horários</th><th>Ações</th></tr></thead><tbody id="tbl-pontos"></tbody></table></div></div>
+</section>
+<section class="view" id="view-escala">
+<div class="page-head"><div><h1>Escala</h1><p>Clique no card para definir senha, guichê, fixo no guichê e apelido para a escala</p></div><button class="btn" onclick="novaEscala()">➕ Incluir</button></div>
+<div class="esc-grid" id="esc-grid"></div>
+</section>
+<section class="view" id="view-escalas">
+<div class="page-head"><div><h1>Escalas Salvas</h1><p>Escalas de trabalho consolidadas</p></div></div>
+<div class="panel"><div class="table-wrap"><table><thead><tr><th>Funcionário</th><th>Apelido</th><th>Local</th><th>Fixo no guichê</th><th>Ações</th></tr></thead><tbody id="tbl-escalas"></tbody></table></div></div>
+</section>
+<section class="view" id="view-histescala">
+<div class="page-head"><div><h1>Histórico de Escala</h1><p>Quantidade de vezes como fixo, suplente e dias no guichê</p></div></div>
+<div class="panel"><div class="table-wrap"><table><thead><tr><th>Funcionário</th><th>Vezes Fixo</th><th>Vezes Suplente</th><th>Dias no Guichê</th><th>Última alteração</th></tr></thead><tbody id="tbl-histescala"></tbody></table></div></div>
+</section>
+<section class="view" id="view-ferias">
+<div class="page-head"><div><h1>Férias</h1><p>Linha do tempo contínua em semanas: datas em sequência real, com o mês indicado na coluna esquerda</p></div>
+<div class="ferias-nav"><button class="nav-btn" onclick="feriasNav(-1)" title="Mês anterior">❮</button><span class="nav-label" id="ferias-nav-label">-</span><button class="nav-btn" onclick="feriasNav(1)" title="Próximo mês">❯</button><button class="btn" onclick="novaFerias()">➕ Incluir</button></div></div>
+<div class="panel"><div class="panel-head"><h3>Linha do tempo</h3><span class="sub">Cada linha é uma semana (dom a sáb) • nome do mês na esquerda • sobreposição vira zebra</span></div><div id="gantt-ferias"></div></div>
+</section>
+<section class="view" id="view-histferias">
+<div class="page-head"><div><h1>Histórico de Férias</h1><p>Linha do tempo de férias de cada funcionário</p></div></div>
+<div class="panel"><div class="panel-head"><h3>Linha do tempo por funcionário</h3><span class="sub">Clique na barra para editar/excluir</span></div><div id="gantt-histferias"></div></div>
+</section>
+<section class="view" id="view-feriados">
+<div class="page-head"><div><h1>Feriados</h1><p>Feriados municipais e nacionais</p></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><select id="ano-base" style="padding:6px 10px;border:1px solid #d3e2f5;border-radius:7px;font-size:11.5px" onchange="renderFeriados()"></select><button class="btn" onclick="novaFeriado()">➕ Incluir</button></div></div>
+<div class="panel"><div class="table-wrap"><table><thead><tr><th>Data</th><th>Nome</th><th>Tipo</th><th>Ações</th></tr></thead><tbody id="tbl-feriados"></tbody></table></div></div>
+</section>
+</main>
+</div>
+<div class="perfil-overlay" id="perfil-overlay">
+<div class="perfil-top"><span class="pt-title" id="pf-titulo">Perfil do Funcionário</span><button class="pt-close" onclick="fecharPerfil()">×</button></div>
+<div class="perfil-body">
+<div class="perfil-left">
+<div class="pf-profile">
+<div class="pf-avatar" id="pf-avatar">?</div>
+<div class="pf-nome" id="pf-nome">-</div>
+<div class="pf-cargo" id="pf-cargo">-</div>
+<div><span class="pf-dep" id="pf-dep">-</span></div>
+</div>
+<div class="pf-nav" id="pf-nav"></div>
+</div>
+<div class="perfil-right">
+<div class="pf-secao"><div class="pf-secao-titulo"><span class="st-ico" id="pf-secao-ico" style="background:#2f9e6e">🕐</span><span id="pf-secao-titulo">Ponto</span></div><div class="pf-cards" id="pf-cards"></div></div>
+</div>
+</div>
+</div>
+<div class="modal-overlay" id="modal-funcionario">
+<div class="modal">
+<div class="modal-head"><h3 id="fu-titulo">Cadastro de Funcionário</h3><button class="modal-close" onclick="fecharModal('modal-funcionario')">×</button></div>
+<div class="modal-body">
+<div class="field"><label>Nome Completo</label><input id="fu-nome" placeholder="Nome do funcionário"></div>
+<div class="field"><label>Matrícula</label><input id="fu-matricula" placeholder="Número da matrícula"></div>
+<div class="field"><label>Cargo</label><div style="display:flex;gap:6px"><select id="fu-cargo" style="flex:1"></select><button class="btn btn-ghost btn-small" onclick="abrirCargoCadastro()" title="Criar cargo">➕</button></div></div>
+<div class="field"><label>Departamento</label><div style="display:flex;gap:6px"><select id="fu-departamento" style="flex:1"></select><button class="btn btn-ghost btn-small" onclick="abrirDepCadastro()" title="Criar departamento">➕</button></div></div>
+<div class="field"><label>Tipo de Contrato</label><div style="display:flex;gap:6px"><select id="fu-contrato" style="flex:1"></select><button class="btn btn-ghost btn-small" onclick="abrirContratoCadastro()" title="Criar tipo de contrato">➕</button></div></div>
+</div>
+<div class="modal-foot"><button class="btn btn-danger" id="fu-excluir-btn" style="display:none;margin-right:auto" onclick="abrirExcluirFuncionario(funcEditando)">🗑️ Excluir</button><button class="btn btn-ghost" onclick="fecharModal('modal-funcionario')">Cancelar</button><button class="btn" onclick="salvarFuncionario()">Salvar</button></div>
+</div>
+</div>
+<div class="modal-overlay" id="modal-ponto">
+<div class="modal">
+<div class="modal-head"><h3 id="pt-titulo">Cadastrar Ponto</h3><button class="modal-close" onclick="fecharModal('modal-ponto')">×</button></div>
+<div class="modal-body">
+<div id="pt-func-wrap"><div class="field"><label>Funcionário</label><select id="pt-func" onchange="ptFuncMudou()"></select></div></div>
+<div class="campos-ponto"><div class="cp-title">📌 Horários do expediente</div>
+<div class="field"><label>Quantidade de horários</label><div style="display:flex;gap:6px"><select id="pt-qtd" style="flex:1" onchange="renderPtCampos()"></select><button class="btn btn-ghost btn-small" onclick="abrirQtdCadastro()" title="Criar quantidade de horários">➕</button></div></div>
+<div id="pt-campos"></div></div>
+</div>
+<div class="modal-foot"><button class="btn btn-danger" id="pt-excluir-btn" style="display:none;margin-right:auto" onclick="abrirExcluirPonto()">🗑️ Excluir</button><button class="btn btn-ghost" onclick="fecharModal('modal-ponto')">Cancelar</button><button class="btn" onclick="salvarPonto()">Salvar</button></div>
+</div>
+</div>
+<div class="modal-overlay" id="modal-ferias">
+<div class="modal">
+<div class="modal-head"><h3 id="fer-titulo">Cadastro de Férias</h3><button class="modal-close" onclick="fecharModal('modal-ferias')">×</button></div>
+<div class="modal-body">
+<div class="field"><label>Funcionário</label><select id="fer-func"></select></div>
+<div class="field-row"><div class="field"><label>Início</label><input type="date" id="fer-inicio" onchange="calcFimFerias()"></div><div class="field"><label>Duração (Dias)</label><input type="number" id="fer-dias" min="1" value="30" onchange="calcFimFerias()"></div></div>
+<div class="field"><label>Fim (calculado)</label><input type="date" id="fer-fim" disabled style="background:var(--cinza)"></div>
+</div>
+<div class="modal-foot"><button class="btn btn-danger" id="fer-excluir-btn" style="display:none;margin-right:auto" onclick="abrirExcluirFerias(feriasEditando)">🗑️ Excluir</button><button class="btn btn-ghost" onclick="fecharModal('modal-ferias')">Cancelar</button><button class="btn" onclick="salvarFerias()">Salvar</button></div>
+</div>
+</div>
+<div class="modal-overlay" id="modal-feriado">
+<div class="modal">
+<div class="modal-head"><h3 id="feri-titulo">Cadastrar Feriado</h3><button class="modal-close" onclick="fecharModal('modal-feriado')">×</button></div>
+<div class="modal-body"><div class="field"><label>Nome do Feriado</label><input id="feri-nome" placeholder="Nome do feriado"></div><div class="field"><label>Data</label><input type="date" id="feri-data"></div><div class="field"><label>Tipo</label><select id="feri-tipo"><option value="Nacional">Nacional</option><option value="Municipal">Municipal</option><option value="Estadual">Estadual</option><option value="Facultativo">Facultativo</option></select></div></div>
+<div class="modal-foot"><button class="btn btn-danger" id="feri-excluir-btn" style="display:none;margin-right:auto" onclick="abrirExcluirFeriado(feriadoEditando)">🗑️ Excluir</button><button class="btn btn-ghost" onclick="fecharModal('modal-feriado')">Cancelar</button><button class="btn" onclick="salvarFeriado()">Salvar</button></div>
+</div>
+</div>
+<div class="modal-overlay" id="modal-generic">
+<div class="modal">
+<div class="modal-head"><h3 id="mg-titulo">-</h3><button class="modal-close" onclick="fecharModal('modal-generic')">×</button></div>
+<div class="modal-body" id="mg-body"></div>
+<div class="modal-foot" id="mg-foot"></div>
+</div>
+</div>
+<div class="modal-overlay" id="modal-confirm">
+<div class="modal" style="max-width:370px">
+<div class="modal-head"><h3 id="cf-titulo">Confirmar</h3><button class="modal-close" onclick="cancelarConfirm()">×</button></div>
+<div class="modal-body" style="padding:20px 16px;text-align:center"><div style="font-size:32px;margin-bottom:6px">⚠️</div><p id="cf-msg" style="font-size:13px;color:var(--texto-suave)"></p></div>
+<div class="modal-foot"><button class="btn btn-ghost" onclick="cancelarConfirm()">Cancelar</button><button class="btn btn-danger" onclick="confirmarAcao()">Confirmar</button></div>
+</div>
+</div>
+<script>
+/* ===== FIREBASE (tempo real em qualquer navegador/computador) ===== */
+const firebaseConfig = {
+  apiKey: "AIzaSyBQ7_k7huhS8oAyKp0OsbEajXFmrNxcrlo",
+  authDomain: "kyro-7cb7a.firebaseapp.com",
+  databaseURL: "https://kyro-7cb7a-default-rtdb.firebaseio.com",
+  projectId: "kyro-7cb7a",
+  storageBucket: "kyro-7cb7a.firebasestorage.app",
+  messagingSenderId: "368737182812",
+  appId: "1:368737182812:web:7be81b22a1a1fec5c97299",
+  measurementId: "G-1XKDHWVEVE"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const KEYS={funcionarios:'kyro_funcionarios',cargos:'kyro_cargos',departamentos:'kyro_departamentos',pontos:'kyro_pontos_salvos',escalas:'kyro_escalas_salvas',escala_hist:'kyro_escala_hist',ferias:'kyro_ferias',feriados:'kyro_feriados',atestados:'kyro_atestados',contratos:'kyro_contratos',quantidades:'kyro_quantidades'};
+const _cache={};
+let _loaded=0;
+const _total=Object.keys(KEYS).length;
+Object.keys(KEYS).forEach(k=>{
+  db.ref(KEYS[k]).on('value',snap=>{
+    _cache[k]=snap.val()||[];
+    _loaded++;
+    if(_loaded>=_total && typeof renderTudo==='function'){try{renderTudo();}catch(e){}}
+  });
+});
+function load(k){return _cache[k]||[];}
+function save(k,d){_cache[k]=d; db.ref(KEYS[k]).set(d);}
+const CONTRATOS_PADRAO=['Efetivo','Estagiário','Comissionado','Terceirizado','Emergencial'];
+const QTD_PADRAO=['4','6'];
+const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const MESES_CURTOS=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const DOWL=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const CORES=['#0055a4','#1e6fd9','#2f9e6e','#d9822b','#7a5cc4','#d64545','#1e9e8e','#b7791f','#3aa0c9','#c94f3a','#5c6b7d','#e05a6a'];
+const HORA_INI=6,HORA_FIM=18;
+const LAB4=['Entrada','Saída Almoço','Entrada Almoço','Saída'];
+const LAB6=['Entrada 1','Saída 1','Entrada 2','Saída 2','Entrada 3','Saída 3'];
+const DEFAULTS4=['08:00','12:00','13:00','18:00'];
+const DEFAULTS6=['07:00','09:00','09:10','12:00','13:00','18:00'];
+function hojeISO(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function fmtData(iso){if(!iso)return '-';const p=iso.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
+function isoDe(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function timeToMin(t){if(!t)return 0;const p=t.split(':');return (+p[0])*60+(+p[1]||0)}
+function horasDoPonto(h){let tot=0;for(let i=0;i+1<h.length;i+=2){tot+=Math.max(0,timeToMin(h[i+1])-timeToMin(h[i]))}return Math.round(tot/60*100)/100}
+function iniciais(nome){return nome.split(' ').filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('')||'?'}
+function corFuncionario(nome){let h=0;for(let i=0;i<nome.length;i++)h=(h*31+nome.charCodeAt(i))>>>0;return CORES[h%CORES.length]}
+function getFuncionarios(){let d=load('funcionarios');let muda=false;d.forEach((f,i)=>{if(!f.id){f.id='f'+Date.now()+'_'+i+'_'+Math.floor(Math.random()*99999);muda=true}});if(muda)save('funcionarios',d);return d}
+function getFuncById(id){return getFuncionarios().find(f=>String(f.id)===String(id))}
+function getPontoDe(fid){return load('pontos').find(p=>p&&String(p.funcId)===String(fid))}
+function getEscalaConfig(fid){const e=load('escalas').find(x=>String(x.matricula)===String(fid));return e?{local:e.local||'senha',fixo:!!e.fixo,apelido:e.apelido||''}:{local:'senha',fixo:false,apelido:''}}
+function qtdAutoContrato(ct){return (ct==='Efetivo'||ct==='Comissionado'||ct==='Emergencial')?6:4}
+function getLabels(qtd){if(qtd===4)return LAB4;if(qtd===6)return LAB6;const l=[];for(let i=0;i<qtd;i++)l.push((i%2===0?'Entrada ':'Saída ')+(Math.floor(i/2)+1));return l}
+function getDefaults(qtd){const base=(qtd===4?DEFAULTS4:DEFAULTS6);const d=[];for(let i=0;i<qtd;i++)d.push(base[i%base.length]);return d}
+function go(v){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));document.getElementById('view-'+v).classList.add('active');document.querySelectorAll('.mod-item').forEach(n=>n.classList.toggle('active',n.dataset.view===v));document.getElementById('sidebar').classList.remove('open');fecharPerfil();renderTudo()}
+function toggleMenu(){document.getElementById('sidebar').classList.toggle('open')}
+function abrirModal(id){document.getElementById(id).classList.add('open');preencherSelects()}
+function fecharModal(id){document.getElementById(id).classList.remove('open')}
+let confirmCb=null;
+function abrirConfirm(t,msg,fn){confirmCb=fn;document.getElementById('cf-titulo').textContent=t;document.getElementById('cf-msg').textContent=msg;abrirModal('modal-confirm')}
+function confirmarAcao(){if(confirmCb){const cb=confirmCb;confirmCb=null;cb()}fecharModal('modal-confirm')}
+function cancelarConfirm(){confirmCb=null;fecharModal('modal-confirm')}
+function abrirMG(titulo,body,foot){document.getElementById('mg-titulo').textContent=titulo;document.getElementById('mg-body').innerHTML=body;document.getElementById('mg-foot').innerHTML=foot;abrirModal('modal-generic')}
+function setSaudacao(){const h=new Date().getHours();const el=document.getElementById('saudacao');if(el)el.textContent=(h<12?'Bom dia':h<18?'Boa tarde':'Boa noite')+', bem-vindo(a) ao ERP Municipal!'}
+setSaudacao();
+let calAno,calMes;
+function calMudar(dir){calMes+=dir;if(calMes<0){calMes=11;calAno--}if(calMes>11){calMes=0;calAno++}renderCalendario()}
+function renderCalendario(){document.getElementById('cal-title').textContent=MESES[calMes]+' '+calAno;const primeiro=new Date(calAno,calMes,1),ini=(primeiro.getDay()+6)%7,dias=new Date(calAno,calMes+1,0).getDate(),hoje=new Date();const ev=new Set();load('feriados').forEach(f=>ev.add(f.data));load('ferias').forEach(f=>{if(f.inicio)ev.add(f.inicio);if(f.fim)ev.add(f.fim)});let h='<div class="dow">S</div><div class="dow">T</div><div class="dow">Q</div><div class="dow">Q</div><div class="dow">S</div><div class="dow">S</div><div class="dow">D</div>';for(let i=0;i<ini;i++)h+='<div class="day other"></div>';for(let d=1;d<=dias;d++){const data=calAno+'-'+String(calMes+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');const isHoje=hoje.getFullYear()===calAno&&hoje.getMonth()===calMes&&hoje.getDate()===d;const isE=ev.has(data);h+='<div class="day '+(isHoje?'today':isE?'event':'')+'">'+d+'</div>'}document.getElementById('cal-grid').innerHTML=h}
+(function(){const a=new Date();calAno=a.getFullYear();calMes=a.getMonth();renderCalendario()})();
+function popularQtdSelect(id){const sel=document.getElementById(id);if(!sel)return;let qs=load('quantidades');if(!qs.length)qs=QTD_PADRAO.slice();const old=sel.value;sel.innerHTML=qs.map(q=>'<option value="'+q+'">'+q+' horários</option>').join('');if(old&&[...sel.options].some(o=>o.value===old))sel.value=old;return sel}
+function preencherSelects(){const funcs=getFuncionarios();const cargos=load('cargos'),deps=load('departamentos');const fc=document.getElementById('fu-cargo');if(fc)fc.innerHTML='<option value="">'+(cargos.length?'Selecione o cargo':'Nenhum cargo criado')+'</option>'+cargos.map(c=>'<option>'+c+'</option>').join('');const fd=document.getElementById('fu-departamento');if(fd)fd.innerHTML='<option value="">'+(deps.length?'Selecione o departamento':'Nenhum departamento criado')+'</option>'+deps.map(d=>'<option>'+d+'</option>').join('');const pf=document.getElementById('pt-func');if(pf)pf.innerHTML=funcs.map(p=>'<option value="'+p.id+'">'+p.nome+'</option>').join('')||'<option value="">Nenhum funcionário cadastrado</option>';const ef=document.getElementById('esc-func');if(ef)ef.innerHTML=funcs.map(p=>'<option value="'+p.id+'">'+p.nome+'</option>').join('')||'<option value="">Nenhum funcionário cadastrado</option>';const ff=document.getElementById('fer-func');if(ff)ff.innerHTML=funcs.map(p=>'<option value="'+p.id+'">'+p.nome+'</option>').join('')||'<option value="">Nenhum funcionário cadastrado</option>';const ct=document.getElementById('fu-contrato');if(ct){let cts=load('contratos');if(!cts.length)cts=CONTRATOS_PADRAO.slice();const oldC=ct.value;ct.innerHTML=cts.map(c=>'<option>'+c+'</option>').join('');if(oldC&&[...ct.options].some(o=>o.value===oldC))ct.value=oldC}popularQtdSelect('pt-qtd')}
+/* ===== CRIAR / EDITAR / EXCLUIR CARGO E DEPARTAMENTO ===== */
+function abrirCargoCadastro(){abrirMG('Criar cargo','<div class="field"><label>Nome do cargo</label><input id="cc-nome" placeholder="Ex.: Assistente Administrativo"></div>','<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Cancelar</button><button class="btn" onclick="salvarCargoRapido()">Salvar cargo</button>')}
+function salvarCargoRapido(){const nome=document.getElementById('cc-nome').value.trim();if(!nome){alert('Informe o cargo');return}const c=load('cargos');if(c.includes(nome)){alert('Cargo já existe');return}c.push(nome);save('cargos',c);preencherSelects();const sel=document.getElementById('fu-cargo');if(sel&&[...sel.options].some(o=>o.text===nome))sel.value=nome;fecharModal('modal-generic')}
+function abrirDepCadastro(){abrirMG('Criar departamento','<div class="field"><label>Nome do departamento</label><input id="cd-nome" placeholder="Ex.: Financeiro"></div>','<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Cancelar</button><button class="btn" onclick="salvarDepRapido()">Salvar departamento</button>')}
+function salvarDepRapido(){const nome=document.getElementById('cd-nome').value.trim();if(!nome){alert('Informe o departamento');return}const d=load('departamentos');if(d.includes(nome)){alert('Departamento já existe');return}d.push(nome);save('departamentos',d);preencherSelects();const sel=document.getElementById('fu-departamento');if(sel&&[...sel.options].some(o=>o.text===nome))sel.value=nome;fecharModal('modal-generic')}
+function cardEditarCargo(){const cargos=load('cargos');if(!cargos.length){abrirMG('Editar cargo','<div class="pf-empty"><span class="e-ico">👥</span>Nenhum cargo cadastrado.</div>','<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>');return}const body='<div class="field"><label>Cargo atual</label><select id="ec-atual">'+cargos.map(c=>'<option>'+c+'</option>').join('')+'</select></div><div class="field"><label>Novo nome</label><input id="ec-novo" placeholder="Novo nome do cargo"></div><div class="alert-info"><b>Remanejamento automático</b>Ao salvar, todos os funcionários com o cargo atual serão atualizados.</div>';abrirMG('Editar cargo',body,'<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Cancelar</button><button class="btn" onclick="salvarEdicaoCargo()">Salvar</button>')}
+function salvarEdicaoCargo(){const atual=document.getElementById('ec-atual').value,novo=document.getElementById('ec-novo').value.trim();if(!novo){alert('Informe o novo nome');return}let c=load('cargos');if(c.includes(novo)&&novo!==atual){alert('Já existe um cargo com esse nome');return}c=c.map(x=>x===atual?novo:x);save('cargos',c);let f=getFuncionarios();f.forEach(x=>{if(x.cargo===atual)x.cargo=novo});save('funcionarios',f);fecharModal('modal-generic');renderTudo()}
+function abrirExcluirCargo(){const c=load('cargos');if(!c.length){alert('Nenhum cargo cadastrado');return}const body=c.map(x=>'<div class="pf-list-item"><div class="pli-main">'+x+'</div><button class="btn btn-small btn-danger" onclick="excluirCargoDef(\''+x.replace(/'/g,"\\'")+'\')">Excluir</button></div>').join('');abrirMG('Excluir cargo',body,'<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>')}
+function excluirCargoDef(nome){abrirConfirm('Excluir cargo','Deseja excluir o cargo "'+nome+'"? Funcionários com esse cargo ficarão sem cargo.',function(){let c=load('cargos');c=c.filter(x=>x!==nome);save('cargos',c);let f=getFuncionarios();f.forEach(x=>{if(x.cargo===nome)x.cargo=''});save('funcionarios',f);fecharModal('modal-generic');renderTudo()})}
+function cardEditarDep(){const deps=load('departamentos');if(!deps.length){abrirMG('Editar departamento','<div class="pf-empty"><span class="e-ico">🏢</span>Nenhum departamento cadastrado.</div>','<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>');return}const body='<div class="field"><label>Departamento atual</label><select id="ed-atual">'+deps.map(d=>'<option>'+d+'</option>').join('')+'</select></div><div class="field"><label>Novo nome</label><input id="ed-novo" placeholder="Novo nome do departamento"></div><div class="alert-info"><b>Remanejamento automático</b>Ao salvar, todos os funcionários do departamento atual serão atualizados.</div>';abrirMG('Editar departamento',body,'<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Cancelar</button><button class="btn" onclick="salvarEdicaoDep()">Salvar</button>')}
+function salvarEdicaoDep(){const atual=document.getElementById('ed-atual').value,novo=document.getElementById('ed-novo').value.trim();if(!novo){alert('Informe o novo nome');return}let d=load('departamentos');if(d.includes(novo)&&novo!==atual){alert('Já existe um departamento com esse nome');return}d=d.map(x=>x===atual?novo:x);save('departamentos',d);let f=getFuncionarios();f.forEach(x=>{if(x.departamento===atual)x.departamento=novo});save('funcionarios',f);fecharModal('modal-generic');renderTudo()}
+function abrirExcluirDep(){const d=load('departamentos');if(!d.length){alert('Nenhum departamento cadastrado');return}const body=d.map(x=>'<div class="pf-list-item"><div class="pli-main">'+x+'</div><button class="btn btn-small btn-danger" onclick="excluirDepDef(\''+x.replace(/'/g,"\\'")+'\')">Excluir</button></div>').join('');abrirMG('Excluir departamento',body,'<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>')}
+function excluirDepDef(nome){abrirConfirm('Excluir departamento','Deseja excluir o departamento "'+nome+'"? Funcionários desse departamento ficarão sem departamento.',function(){let d=load('departamentos');d=d.filter(x=>x!==nome);save('departamentos',d);let f=getFuncionarios();f.forEach(x=>{if(x.departamento===nome)x.departamento=''});save('funcionarios',f);fecharModal('modal-generic');renderTudo()})}
+/* ===== CRIAR TIPO DE CONTRATO E QUANTIDADE DE HORÁRIOS (com +) ===== */
+function abrirContratoCadastro(){abrirMG('Criar tipo de contrato','<div class="field"><label>Nome do contrato</label><input id="cc2-nome" placeholder="Ex.: Contrato Temporário"></div>','<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Cancelar</button><button class="btn" onclick="salvarContratoRapido()">Salvar</button>')}
+function salvarContratoRapido(){const nome=document.getElementById('cc2-nome').value.trim();if(!nome){alert('Informe o tipo de contrato');return}const c=load('contratos');if(c.includes(nome)){alert('Tipo de contrato já existe');return}c.push(nome);save('contratos',c);preencherSelects();const sel=document.getElementById('fu-contrato');if(sel&&[...sel.options].some(o=>o.text===nome))sel.value=nome;fecharModal('modal-generic')}
+function abrirQtdCadastro(){abrirMG('Criar quantidade de horários','<div class="field"><label>Quantidade (par)</label><input id="cq-nome" type="number" min="2" step="2" placeholder="Ex.: 4 ou 6"></div><div class="alert-info">4 horários: Entrada, Saída Almoço, Entrada Almoço, Saída. 6 horários: três períodos de entrada e saída.</div>','<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Cancelar</button><button class="btn" onclick="salvarQtdRapido()">Salvar</button>')}
+function salvarQtdRapido(){const v=parseInt(document.getElementById('cq-nome').value);if(!v||v<2||v%2!==0){alert('Informe uma quantidade par (ex.: 4, 6, 8)');return}const qs=load('quantidades');const chave=String(v);if(qs.includes(chave)){alert('Essa quantidade já existe');return}qs.push(chave);qs.sort((a,b)=>a-b);save('quantidades',qs);popularQtdSelect('pt-qtd');fecharModal('modal-generic');const psel=document.getElementById('pt-qtd');if(psel)psel.value=chave;if(document.getElementById('pt-campos'))renderPtCampos()}
+/* ===== REMANEJAR ===== */
+function abrirRemanejar(){const cargos=load('cargos'),deps=load('departamentos');if(!cargos.length&&!deps.length){alert('Crie ao menos um cargo ou departamento primeiro');return}const body='<div class="field"><label>Tipo</label><select id="rm-tipo" onchange="atualizarRMOpcoes()"><option value="cargo">Cargo</option><option value="departamento">Departamento</option></select></div><div id="rm-campos"><div class="field"><label>De</label><select id="rm-de">'+cargos.map(c=>'<option>'+c+'</option>').join('')+'</select></div><div class="field"><label>Para</label><select id="rm-para">'+cargos.map(c=>'<option>'+c+'</option>').join('')+'</select></div></div>';abrirMG('Remanejar funcionários',body,'<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Cancelar</button><button class="btn" onclick="salvarRemanejar()">Aplicar remanejamento</button>')}
+function atualizarRMOpcoes(){const t=document.getElementById('rm-tipo').value;const lista=t==='cargo'?load('cargos'):load('departamentos');document.getElementById('rm-campos').innerHTML='<div class="field"><label>De</label><select id="rm-de">'+lista.map(c=>'<option>'+c+'</option>').join('')+'</select></div><div class="field"><label>Para</label><select id="rm-para">'+lista.map(c=>'<option>'+c+'</option>').join('')+'</select></div>'}
+function salvarRemanejar(){const t=document.getElementById('rm-tipo').value,de=document.getElementById('rm-de').value,para=document.getElementById('rm-para').value;if(!de||!para||de===para){alert('Selecione valores diferentes');return}const campo=t==='cargo'?'cargo':'departamento';const fs=getFuncionarios();let n=0;fs.forEach(f=>{if(f[campo]===de){f[campo]=para;n++}});save('funcionarios',fs);fecharModal('modal-generic');renderTudo();alert(n+' funcionário(s) atualizado(s)')}
+/* ===== APAGAR EM LOTE ===== */
+let loteMode=false,loteSel=new Set();
+function apagarEmLote(){loteMode=true;loteSel.clear();document.getElementById('lote-bar').classList.add('show');document.getElementById('lote-info').textContent='0 selecionado(s)';renderFuncionarios()}
+function cancelarLote(){loteMode=false;loteSel.clear();document.getElementById('lote-bar').classList.remove('show');renderFuncionarios()}
+function toggleLote(id){if(loteSel.has(String(id)))loteSel.delete(String(id));else loteSel.add(String(id));document.getElementById('lote-info').textContent=loteSel.size+' selecionado(s)'}
+function excluirEmCascata(id,nome){let fs=getFuncionarios();fs=fs.filter(f=>String(f.id)!==String(id));save('funcionarios',fs);let pts=load('pontos');pts=pts.filter(p=>String(p.funcId)!==String(id));save('pontos',pts);let fe=load('ferias');fe=fe.filter(x=>!(String(x.mf)===String(id)||x.nome===nome));save('ferias',fe);let es=load('escalas');es=es.filter(x=>String(x.matricula)!==String(id));save('escalas',es);let eh=load('escala_hist');eh=eh.filter(x=>String(x.matricula)!==String(id));save('escala_hist',eh);let at=load('atestados');at=at.filter(x=>String(x.matricula)!==String(id));save('atestados',at)}
+function excluirLoteSelecionados(){if(!loteSel.size){alert('Selecione ao menos um funcionário com a caixa da esquerda');return}abrirConfirm('Apagar em lote','Deseja excluir '+loteSel.size+' funcionário(s) selecionado(s)? Pontos, férias, escalas e atestados deles também serão excluídos.',function(){let targets=[];getFuncionarios().forEach(f=>{if(loteSel.has(String(f.id)))targets.push({id:f.id,nome:f.nome})});targets.forEach(t=>excluirEmCascata(t.id,t.nome));cancelarLote();renderTudo()})}
+/* ===== FUNCIONÁRIOS ===== */
+let funcEditando=null;
+function novaFuncionario(){funcEditando=null;document.getElementById('fu-titulo').textContent='Cadastro de Funcionário';document.getElementById('fu-excluir-btn').style.display='none';document.getElementById('fu-nome').value='';document.getElementById('fu-matricula').value='';preencherSelects();document.getElementById('fu-cargo').value='';document.getElementById('fu-departamento').value='';document.getElementById('fu-contrato').value='Efetivo';abrirModal('modal-funcionario')}
+function abrirEditarFuncionario(id){const f=getFuncById(id);if(!f)return;funcEditando=String(f.id);preencherSelects();document.getElementById('fu-nome').value=f.nome;document.getElementById('fu-matricula').value=f.matricula;document.getElementById('fu-cargo').value=f.cargo||'';document.getElementById('fu-departamento').value=f.departamento||'';const ctSel=document.getElementById('fu-contrato');ctSel.value=(f.contrato&&[...ctSel.options].some(o=>o.value===f.contrato))?f.contrato:'Efetivo';document.getElementById('fu-titulo').textContent='Editar Funcionário';document.getElementById('fu-excluir-btn').style.display='inline-flex';abrirModal('modal-funcionario')}
+function salvarFuncionario(){const nome=document.getElementById('fu-nome').value.trim(),matricula=document.getElementById('fu-matricula').value.trim();const cargo=document.getElementById('fu-cargo').value,dep=document.getElementById('fu-departamento').value;const contrato=document.getElementById('fu-contrato').value;if(!nome||!matricula){alert('Preencha nome e matrícula');return}const d=getFuncionarios();let id=funcEditando;if(!id)id='f'+Date.now()+'_'+Math.floor(Math.random()*99999);const obj={id,nome,matricula,cargo,departamento:dep,contrato};if(funcEditando){const i=d.findIndex(x=>String(x.id)===String(funcEditando));if(i>=0)d[i]=obj}else d.push(obj);save('funcionarios',d);funcEditando=null;fecharModal('modal-funcionario');renderTudo()}
+function abrirExcluirFuncionario(id){fecharModal('modal-funcionario');const f=getFuncById(id);abrirConfirm('Excluir funcionário','Deseja excluir o funcionário "'+(f?f.nome:'')+'"? Pontos, férias, escalas e atestados dele também serão excluídos.',function(){excluirFuncionarioNow(id)})}
+function excluirFuncionario(id){abrirExcluirFuncionario(id)}
+function excluirFuncionarioNow(id){const f=getFuncById(id);if(!f)return;excluirEmCascata(id,f.nome);fecharModal('modal-funcionario');renderTudo()}
+function renderFuncionarios(){const d=getFuncionarios();const thead=document.getElementById('tbl-func-head');thead.innerHTML=(loteMode?'<th style="text-align:center;width:36px">Sel</th>':'')+'<th>Nome Completo</th><th>Matrícula</th><th>Cargo</th><th>Departamento</th><th>Contrato</th><th>Ações</th>';document.getElementById('tbl-funcionarios').innerHTML=d.length?d.map(f=>'<tr>'+(loteMode?'<td class="check-cell"><input type="checkbox" '+(loteSel.has(String(f.id))?'checked':'')+' onchange="toggleLote(\''+f.id+'\')"></td>':'')+'<td><b>'+f.nome+'</b></td><td>'+f.matricula+'</td><td>'+(f.cargo||'-')+'</td><td>'+(f.departamento||'-')+'</td><td><span class="badge tipo">'+(f.contrato||'-')+'</span></td><td><div class="row-actions"><button title="Editar" onclick="abrirEditarFuncionario(\''+f.id+'\')">✏️</button><button title="Excluir" class="danger" onclick="excluirFuncionario(\''+f.id+'\')">🗑️</button></div></td></tr>').join(''):'<tr><td colspan="'+(loteMode?7:6)+'"><div class="empty"><span class="e-ico">👥</span>Nenhum funcionário cadastrado.</div></td></tr>'}
+/* ===== PONTO ===== */
+let pontoModoPerfil=false,pontoFuncId=null;
+function renderPtCampos(){const qtd=parseInt(document.getElementById('pt-qtd').value)||4;const labels=getLabels(qtd),defs=getDefaults(qtd);const grp=document.getElementById('pt-campos');let h='<div class="field-row">';for(let i=0;i<qtd;i++){h+='<div class="field"><label>'+labels[i]+'</label><input type="time" id="pt-h'+i+'"></div>'+(i%2===1&&i<qtd-1?'</div><div class="field-row">':'')}h+='</div>';grp.innerHTML=h;const sel=document.getElementById('pt-func');const fid=pontoModoPerfil&&perfilFunc?perfilFunc.id:(sel?sel.value:'');const rec=getPontoDe(fid);for(let i=0;i<qtd;i++){const el=document.getElementById('pt-h'+i);if(el)el.value=(rec&&rec.horarios&&rec.horarios[i])?rec.horarios[i].time:defs[i]}}
+function ptFuncMudou(){const fid=document.getElementById('pt-func').value;const f=getFuncById(fid);const rec=getPontoDe(fid);if(rec&&rec.horarios){document.getElementById('pt-qtd').value=String(rec.horarios.length)}else{document.getElementById('pt-qtd').value=String((f&&qtdAutoContrato(f.contrato))||4)}renderPtCampos()}
+function abrirModalPonto(fid){pontoModoPerfil=!!perfilFunc&&(fid===perfilFunc.id);pontoFuncId=fid||(perfilFunc?perfilFunc.id:(document.getElementById('pt-func').value||''));const rec=getPontoDe(pontoFuncId);document.getElementById('pt-titulo').textContent=(rec?'Editar':'Cadastrar')+' Ponto de '+(rec?rec.nome:(getFuncById(pontoFuncId)?getFuncById(pontoFuncId).nome:''));if(pontoModoPerfil){document.getElementById('pt-func-wrap').style.display='none'}else{document.getElementById('pt-func-wrap').style.display='';preencherSelects();const sel=document.getElementById('pt-func');if(pontoFuncId){if(![...sel.options].some(o=>o.value===String(pontoFuncId))){const f=getFuncById(pontoFuncId);if(f)sel.innerHTML='<option value="'+f.id+'">'+f.nome+'</option>'+sel.innerHTML}sel.value=String(pontoFuncId)}}if(rec&&rec.horarios){document.getElementById('pt-qtd').value=String(rec.horarios.length)}else{document.getElementById('pt-qtd').value=pontoFuncId?String((getFuncById(pontoFuncId)&&qtdAutoContrato(getFuncById(pontoFuncId).contrato))||4):'4'}renderPtCampos();document.getElementById('pt-excluir-btn').style.display=rec?'inline-flex':'none';abrirModal('modal-ponto')}
+function novoPonto(){pontoModoPerfil=false;pontoFuncId=null;document.getElementById('pt-titulo').textContent='Cadastrar Ponto';document.getElementById('pt-func-wrap').style.display='';preencherSelects();document.getElementById('pt-qtd').value='4';renderPtCampos();document.getElementById('pt-excluir-btn').style.display='none';abrirModal('modal-ponto')}
+function abrirEditarPonto(fid){abrirModalPonto(fid)}
+function salvarPonto(){let fid=pontoModoPerfil?(perfilFunc?perfilFunc.id:''):pontoFuncId||document.getElementById('pt-func').value;if(!fid)fid=document.getElementById('pt-func').value;const f=getFuncById(fid);if(!f){alert('Selecione um funcionário');return}const qtd=parseInt(document.getElementById('pt-qtd').value)||4;const labels=getLabels(qtd);const horarios=[];for(let i=0;i<qtd;i++){const el=document.getElementById('pt-h'+i);if(!el.value){alert('Preencha todos os horários');return}horarios.push({label:labels[i],time:el.value})}const horas=horasDoPonto(horarios.map(x=>x.time));const pts=load('pontos');let rec=pts.find(p=>String(p.funcId)===String(fid));if(rec){rec.nome=f.nome;rec.contrato=f.contrato||'';rec.horarios=horarios;rec.horas=horas}else pts.push({funcId:fid,nome:f.nome,contrato:f.contrato||'',horarios,horas});save('pontos',pts);fecharModal('modal-ponto');renderTudo()}
+function abrirExcluirPonto(){const fid=pontoModoPerfil?(perfilFunc?perfilFunc.id:''):pontoFuncId||document.getElementById('pt-func').value;const rec=getPontoDe(fid);if(!rec){alert('Este funcionário ainda não tem ponto cadastrado');return}abrirConfirm('Excluir ponto','Deseja excluir o ponto de '+(rec.nome||'este funcionário')+'?',function(){let pts=load('pontos');pts=pts.filter(p=>String(p.funcId)!==String(fid));save('pontos',pts);fecharModal('modal-ponto');renderTudo()})}
+function excluirPonto(fid){pontoFuncId=fid;pontoModoPerfil=!!(perfilFunc&&perfilFunc.id===fid);abrirExcluirPonto()}
+function renderPonto(){const busca=(document.getElementById('ponto-busca').value||'').toLowerCase();const dAll=getFuncionarios();let funcs=dAll.filter(f=>getPontoDe(f.id));if(busca)funcs=funcs.filter(f=>f.nome.toLowerCase().includes(busca));const pts=load('pontos');const el=document.getElementById('gantt-ponto');if(!funcs.length){el.innerHTML='<div class="empty"><span class="e-ico">🕐</span>'+(busca?'Nenhum funcionário encontrado.':'Nenhum ponto cadastrado. Use o botão "Incluir" para cadastrar o expediente de um funcionário.')+'</div>';return}const totalMin=(HORA_FIM-HORA_INI)*60;let head='<div class="tl-head"><div class="tl-corner">Horário</div>'+funcs.map(f=>{const cor=corFuncionario(f.nome),ini=iniciais(f.nome);return '<div class="tl-func" onclick="abrirPerfil('+dAll.indexOf(f)+')" title="'+f.nome+'"><span class="tf-av" style="color:'+cor+';border:2px solid '+cor+'">'+ini+'</span><span class="tf-nm">'+f.nome+'</span></div>'}).join('')+'</div>';let times='';for(let h=HORA_INI;h<=HORA_FIM;h++){const top=((h-HORA_INI)*60/totalMin)*100;times+='<div class="tl-time" style="top:'+top+'%">'+String(h).padStart(2,'0')+':00</div>'}let linhas='';for(let h=HORA_INI;h<=HORA_FIM;h++){const top=((h-HORA_INI)*60/totalMin)*100;linhas+='<div class="tl-line" style="top:'+top+'%"></div>'}let tracks=funcs.map(f=>{const cor=corFuncionario(f.nome),ini=iniciais(f.nome);const rec=pts.find(p=>String(p.funcId)===String(f.id));let bars=linhas;if(rec&&rec.horarios&&rec.horarios.length){const hs=rec.horarios.map(x=>x.time).filter(Boolean);const t0=timeToMin(hs[0]),tN=timeToMin(hs[hs.length-1]);const top=((t0-HORA_INI*60)/totalMin)*100;const hgt=Math.max(3,((tN-t0)/totalMin)*100);bars+='<div class="tl-bar" style="top:'+top+'%;height:'+hgt+'%;background:'+cor+'" title="'+f.nome+' • '+hs.join(' • ')+'" onclick="abrirModalPonto(\''+f.id+'\')"><span class="tb-av" style="color:'+cor+';border:2px solid '+cor+'">'+ini+'</span> '+hs[0]+' | '+hs[hs.length-1]+'</div>'}return '<div class="tl-track">'+bars+'</div>'}).join('');el.innerHTML='<div class="tl">'+head+'<div class="tl-body"><div class="tl-times">'+times+'</div><div class="tl-track-wrap">'+tracks+'</div></div></div>'}
+function renderPontos(){const pts=load('pontos').slice().sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));document.getElementById('tbl-pontos').innerHTML=pts.length?pts.map(p=>'<tr><td><b>'+(p.nome||'-')+'</b></td><td><span class="badge tipo">'+(p.contrato||'-')+'</span></td><td>'+(p.horarios?p.horarios.map(h=>h.time).join(' • '):'-')+'</td><td><div class="row-actions"><button title="Visualizar no Ponto" onclick="document.getElementById(\'ponto-busca\').value=\''+(p.nome||'')+'\';go(\'ponto\')">👁️</button><button title="Editar" onclick="abrirEditarPonto(\''+p.funcId+'\')">✏️</button><button title="Excluir" class="danger" onclick="excluirPonto(\''+p.funcId+'\')">🗑️</button></div></td></tr>').join(''):'<tr><td colspan="4"><div class="empty"><span class="e-ico">💾</span>Nenhum ponto cadastrado ainda.</div></td></tr>';const totalHoras=pts.reduce((s,p)=>s+(p.horas||0),0);document.getElementById('stats-pontos').innerHTML='<div class="stat"><div class="s-num">'+pts.length+'</div><div class="s-label">Pontos</div></div><div class="stat"><div class="s-num">'+totalHoras.toFixed(1)+'h</div><div class="s-label">Horas/dia somadas</div></div><div class="stat"><div class="s-num">'+getFuncionarios().length+'</div><div class="s-label">Funcionários</div></div>'}
+function imprimirPonto(){window.print()}
+/* ===== ESCALA (com APELIDO para a escala) ===== */
+function getEscalados(){return getFuncionarios().filter(f=>load('escalas').some(e=>String(e.matricula)===String(f.id)))}
+function renderEscala(){const funcs=getEscalados();const grid=document.getElementById('esc-grid');if(!funcs.length){grid.innerHTML='<div class="empty"><span class="e-ico">📅</span>Nenhum funcionário na escala. Use o botão "Incluir" para alocar um funcionário.</div>';return}grid.innerHTML=funcs.map(f=>{const cfg=getEscalaConfig(f.id),cor=corFuncionario(f.nome);const chips='<span class="esc-chip '+(cfg.local==='guiche'?'guiche':'senha')+'">'+(cfg.local==='guiche'?'🪟 Guichê':'🎫 Senha')+'</span>'+(cfg.fixo?'<span class="esc-chip fixo">🔒 Fixo no guichê</span>':'');const ap=(cfg.apelido?'<div class="esc-apelido">Apelido: <b style="color:var(--azul)">'+cfg.apelido+'</b></div>':'');return '<div class="esc-card" style="border-left:4px solid '+cor+'" onclick="abrirAlterarEscala(\''+f.id+'\')"><div class="esc-top"><div class="esc-avatar" style="background:'+cor+'">'+iniciais(f.nome)+'</div><div><div class="esc-nome">'+f.nome+'</div>'+ap+'<div style="font-size:10px;color:var(--texto-suave)">'+(f.cargo||'-')+' • '+(f.contrato||'-')+'</div><div style="margin-top:4px">'+chips+'</div></div></div><div style="font-size:10px;color:var(--azul);text-align:right;margin-top:6px">Clique para alterar ➡️</div></div>'}).join('')}
+function abrirAlterarEscala(id){const f=getFuncById(id);if(!f)return;const cfg=getEscalaConfig(f.id);const body='<div class="field"><label>Funcionário</label><input value="'+f.nome+'" disabled style="background:var(--cinza)"></div><div class="field"><label>Apelido para a escala</label><input id="ae-apelido" value="'+cfg.apelido+'" placeholder="Ex.: Zé, Maria, Biro..."></div><div class="field"><label>Local de trabalho</label><select id="ae-local"><option value="senha" '+(cfg.local!=='guiche'?'selected':'')+'>🎫 Senha</option><option value="guiche" '+(cfg.local==='guiche'?'selected':'')+'>🪟 Guichê</option></select></div><div class="field-check"><input type="checkbox" id="ae-fixo" '+(cfg.fixo?'checked':'')+'> Fixo no guichê</div>';abrirMG('Escala de '+f.nome,body,'<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Cancelar</button><button class="btn" onclick="salvarEscalaConfig(\''+f.id+'\')">Salvar</button>')}
+function salvarEscalaConfig(id){if(!id){const s=document.getElementById('esc-func');id=s?s.value:''}if(!id){alert('Selecione um funcionário');return}const apelido=document.getElementById('ae-apelido')?document.getElementById('ae-apelido').value.trim():'';const local=document.getElementById('ae-local').value,fixo=document.getElementById('ae-fixo').checked;const f=getFuncById(id);if(!f)return;let e=load('escalas');let item=e.find(x=>String(x.matricula)===String(f.id));if(item){item.nome=f.nome;item.apelido=apelido;item.local=local;item.fixo=fixo}else e.push({matricula:f.id,nome:f.nome,apelido,local,fixo});save('escalas',e);const h=load('escala_hist');h.push({matricula:f.id,nome:f.nome,apelido,local,fixo,ts:new Date().toLocaleString('pt-BR')});save('escala_hist',h);fecharModal('modal-generic');renderTudo()}
+function novaEscala(){const funcs=getFuncionarios();if(!funcs.length){alert('Nenhum funcionário cadastrado');return}const body='<div class="field"><label>Funcionário</label><select id="esc-func">'+funcs.map(f=>'<option value="'+f.id+'">'+f.nome+'</option>').join('')+'</select></div><div class="field"><label>Apelido para a escala</label><input id="ae-apelido" placeholder="Ex.: Zé, Maria, Biro..."></div><div class="field"><label>Local de trabalho</label><select id="ae-local"><option value="senha">🎫 Senha</option><option value="guiche">🪟 Guichê</option></select></div><div class="field-check"><input type="checkbox" id="ae-fixo"> Fixo no guichê</div>';abrirMG('Incluir funcionário na escala',body,'<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Cancelar</button><button class="btn" onclick="salvarEscalaConfig(\'\')">Salvar</button>')}
+function excluirEscalaConfig(id){const f=getFuncById(id);abrirConfirm('Remover da escala','Deseja remover a configuração de escala de '+(f?f.nome:'este funcionário')+'?',function(){let e=load('escalas');e=e.filter(x=>String(x.matricula)!==String(id));save('escalas',e);renderTudo()})}
+function renderEscalas(){const e=load('escalas');document.getElementById('tbl-escalas').innerHTML=e.length?e.map(x=>'<tr><td><b>'+x.nome+'</b></td><td>'+(x.apelido?'<span class="badge ok">'+x.apelido+'</span>':'-')+'</td><td><span class="badge '+(x.local==='guiche'?'guiche':'senha')+'">'+(x.local==='guiche'?'Guichê':'Senha')+'</span></td><td>'+(x.fixo?'<span class="badge ok">Sim</span>':'<span class="badge tipo">Não</span>')+'</td><td><div class="row-actions"><button title="Editar" onclick="abrirAlterarEscala(\''+x.matricula+'\')">✏️</button><button title="Excluir" class="danger" onclick="excluirEscalaConfig(\''+x.matricula+'\')">🗑️</button></div></td></tr>').join(''):'<tr><td colspan="5"><div class="empty"><span class="e-ico">🗂️</span>Nenhuma escala cadastrada.</div></td></tr>';const hist={};load('escala_hist').forEach(ev=>{if(!hist[ev.matricula])hist[ev.matricula]={nome:ev.nome,fixo:0,sup:0,guiche:0,ult:''};if(ev.fixo)hist[ev.matricula].fixo++;else hist[ev.matricula].sup++;if(ev.local==='guiche')hist[ev.matricula].guiche++;hist[ev.matricula].ult=ev.ts});const rows=Object.values(hist).sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));document.getElementById('tbl-histescala').innerHTML=rows.length?rows.map(x=>'<tr><td><b>'+x.nome+'</b></td><td><span class="badge fixo">'+x.fixo+'</span></td><td><span class="badge suplente">'+x.sup+'</span></td><td><span class="badge guiche">'+x.guiche+'</span></td><td style="font-size:10px;color:var(--texto-suave)">'+x.ult+'</td></tr>').join(''):'<tr><td colspan="5"><div class="empty">Sem histórico de escala ainda.</div></td></tr>'}
+function imprimirEscala(){window.print()}
+/* ===== FÉRIAS ===== */
+let fcY,fcM,feriasEditando=-1;
+(function(){const a=new Date();fcY=a.getFullYear();fcM=a.getMonth()})();
+function countMeses(){return 3}
+function feriasNav(dir){fcM+=dir;if(fcM<0){fcM=11;fcY--}if(fcM>11){fcM=0;fcY++}renderFerias()}
+function zebraBg(cores){const n=cores.length,w=n>2?4:7,parts=[];for(let i=0;i<n;i++)parts.push(cores[i]+' '+i*w+'px '+((i+1)*w)+'px');return 'repeating-linear-gradient(90deg,'+parts.join(',')+')'}
+function renderFerias(){const dados=load('ferias');const count=countMeses();let fy=fcY,fm=fcM+count-1;while(fm>11){fm-=12;fy++}document.getElementById('ferias-nav-label').textContent=MESES[fcM]+' '+fcY+' a '+MESES[fm]+' '+fy;const first=new Date(fcY,fcM,1);const start=new Date(fcY,fcM,1-first.getDay());const lastDay=new Date(fy,fm+1,0);const end=new Date(fy,fm+1,0+(6-lastDay.getDay()));const nWeeks=Math.ceil((Math.round((end-start)/86400000)+1)/7);let html='<div class="fc"><div class="fc-head"><div class="fc-label">Mês</div>'+DOWL.map(d=>'<div class="fc-dow">'+d.slice(0,1)+'</div>').join('')+'</div><div class="fc-weeks">';let prevMonth=null;for(let w=0;w<nWeeks;w++){const ws=new Date(start.getTime()+w*7*86400000),we=new Date(start.getTime()+(w*7+6)*86400000);const mw=ws.getMonth(),my=ws.getFullYear();const show=(mw!==prevMonth);prevMonth=mw;let cells='';for(let d=0;d<7;d++){const dt=new Date(start.getTime()+(w*7+d)*86400000);const dd=dt.getDate(),inRange=dt>=first&&dt<=lastDay;cells+='<div class="fc-cell '+(inRange?'':'other ')+(d===0?'dom ':'')+(d===6?'sab ':'')+'">'+dd+'</div>'}const itens=[];dados.forEach((r,idx)=>{if(!r.inicio)return;const s=new Date(r.inicio);let e=r.fim?new Date(r.fim):null;if(!e||isNaN(e)){e=new Date(s);e.setDate(e.getDate()+(r.dias||30))}if(e<ws||s>we)return;const a=s<ws?ws:s,b=e>we?we:e;const li=Math.max(0,Math.round((a-ws)/86400000)),ri=Math.min(6,Math.round((b-ws)/86400000));itens.push({idx,r,li,ri,offL:a>s,offR:b<e})});const pts=new Set([0,7]);itens.forEach(it=>{pts.add(it.li);pts.add(it.ri+1)});const frontier=[...pts].sort((x,y)=>x-y);let bars='';for(let i=0;i<frontier.length-1;i++){const x0=frontier[i],x1=frontier[i+1];if(x1<=x0)continue;const ativ=itens.filter(it=>it.li<=x0&&it.ri>=x1-1);if(!ativ.length)continue;const left=(x0/7)*100,width=((x1-x0)/7)*100;const r0=ativ[0].r,cor=corFuncionario(r0.nome),ini=iniciais(r0.nome);let bg;if(ativ.length===1){bg=cor}else{const cores=ativ.map(it=>corFuncionario(it.r.nome));bg=zebraBg(cores)}const lRound=ativ.some(it=>it.li===x0&&!it.offL),rRound=ativ.some(it=>it.ri===x1-1&&!it.offR);const av='<span class="fc-avatar">'+ini+'</span>';const lbl=(width>15)?av+r0.nome.split(' ')[0]:av;const ttl=ativ.map(it=>it.r.nome+' • '+fmtData(it.r.inicio)+' a '+fmtData(it.r.fim)+' ('+it.r.dias+'d)').join('\n');bars+='<div class="fc-bar '+(lRound?'fc-l':'')+' '+(rRound?'fc-r':'')+'" style="left:'+left+'%;width:'+width+'%;background:'+bg+'" title="'+ttl+'" onclick="event.stopPropagation();abrirEditarFerias('+ativ[0].idx+')">'+lbl+'</div>'}const labelCell='<div class="fc-mlabel'+(show?'':' fc-mlabel-empty')+'">'+(show?(MESES_CURTOS[mw]+' '+String(my).slice(2)):'')+'</div>';html+='<div class="fc-week">'+labelCell+'<div class="fc-cells">'+cells+bars+'</div></div>'}html+='</div></div>';document.getElementById('gantt-ferias').innerHTML=html}
+function renderHistFerias(){const d=load('ferias');const el=document.getElementById('gantt-histferias');if(!d.length){el.innerHTML='<div class="empty"><span class="e-ico">📋</span>Nenhuma férias registrada.</div>';return}const anos=[...new Set(d.map(r=>r.inicio?parseInt(r.inicio.slice(0,4)):null))].filter(n=>!isNaN(n));const cur=new Date().getFullYear();let minY=anos.length?Math.min.apply(null,anos):cur,maxY=anos.length?Math.max.apply(null,anos):cur;minY=Math.min(minY,cur-2);maxY=Math.max(maxY,cur+1);const totalMonths=(maxY-minY+1)*12;let head='<div class="hfc-head"><div class="hfc-label">Funcionário</div><div class="hfc-grid">';for(let y=minY;y<=maxY;y++)for(let mo=0;mo<12;mo++)head+='<div class="hfc-mon" title="'+MESES[mo]+' '+y+'">'+MESES_CURTOS[mo]+'</div>';head+='</div></div>';const byName={};d.forEach(r=>{if(!byName[r.nome])byName[r.nome]=[];byName[r.nome].push(r)});let rows='';Object.entries(byName).forEach(([nome,recs])=>{const cor=corFuncionario(nome),ini=iniciais(nome);let bars='';recs.forEach(r=>{if(!r.inicio)return;const iy=parseInt(r.inicio.slice(0,4)),im=parseInt(r.inicio.slice(5,7))-1;const fy2=r.fim?parseInt(r.fim.slice(0,4)):iy,fm2=r.fim?parseInt(r.fim.slice(5,7))-1:im;const idxIni=((iy-minY)*12+im),idxFim=((fy2-minY)*12+fm2);const left=(idxIni/totalMonths)*100;const w=Math.max(1.5,((idxFim-idxIni+1)/totalMonths)*100);const di=d.indexOf(r);bars+='<div class="hfc-bar" style="left:'+left+'%;width:'+w+'%;background:'+cor+'" title="'+nome+' • '+fmtData(r.inicio)+' a '+fmtData(r.fim)+' ('+r.dias+'d)" onclick="abrirEditarFerias('+di+')">'+MESES_CURTOS[im]+'</div>'});rows+='<div class="hfc-row"><div class="hfc-label"><span class="ha" style="background:'+cor+'">'+ini+'</span>'+nome+'</div><div class="hfc-track">'+bars+'</div></div>'});el.innerHTML='<div class="hfc">'+head+rows+'</div>'}
+function novaFerias(){feriasEditando=-1;document.getElementById('fer-titulo').textContent='Cadastro de Férias';document.getElementById('fer-excluir-btn').style.display='none';preencherSelects();document.getElementById('fer-inicio').value='';document.getElementById('fer-dias').value='30';document.getElementById('fer-fim').value='';abrirModal('modal-ferias')}
+function abrirEditarFerias(idx){const d=load('ferias'),f=d[idx];if(!f)return;feriasEditando=idx;preencherSelects();const sel=document.getElementById('fer-func');const func=getFuncionarios().find(p=>p.nome===f.nome);if(func&&![...sel.options].some(o=>o.value===String(func.id))){sel.innerHTML='<option value="'+func.id+'">'+func.nome+'</option>'+sel.innerHTML}if(func)sel.value=String(func.id);document.getElementById('fer-inicio').value=f.inicio;document.getElementById('fer-dias').value=f.dias;calcFimFerias();document.getElementById('fer-titulo').textContent='Editar Férias';document.getElementById('fer-excluir-btn').style.display='inline-flex';abrirModal('modal-ferias')}
+function calcFimFerias(){const ini=document.getElementById('fer-inicio').value,dias=parseInt(document.getElementById('fer-dias').value)||30;if(!ini){document.getElementById('fer-fim').value='';return}const f=new Date(ini);f.setDate(f.getDate()+dias);document.getElementById('fer-fim').value=f.toISOString().slice(0,10)}
+function salvarFerias(){const id=document.getElementById('fer-func').value,inicio=document.getElementById('fer-inicio').value,dias=parseInt(document.getElementById('fer-dias').value)||30;if(!id||!inicio){alert('Selecione funcionário e data de início');return}const f=getFuncById(id);const nome=f?f.nome:id;const fim=new Date(inicio);fim.setDate(fim.getDate()+dias);const d=load('ferias');const obj={nome,mf:id,inicio,fim:fim.toISOString().slice(0,10),dias};if(feriasEditando>=0)d[feriasEditando]=obj;else d.push(obj);save('ferias',d);feriasEditando=-1;fecharModal('modal-ferias');renderTudo()}
+function abrirExcluirFerias(idx){fecharModal('modal-ferias');const f=load('ferias')[idx];abrirConfirm('Excluir férias','Deseja excluir este cadastro de férias'+(f&&f.nome?' de '+f.nome:'')+'?',function(){excluirFerias(idx)})}
+function excluirFerias(i){const d=load('ferias');if(!d[i])return;d.splice(i,1);save('ferias',d);feriasEditando=-1;fecharModal('modal-ferias');renderTudo()}
+function desempenhoFerias(){const f=perfilFunc;if(!f)return;const todas=load('ferias').filter(x=>x.nome===f.nome).sort((a,b)=>a.inicio.localeCompare(b.inicio));let body='';if(!todas.length){body='<div class="pf-empty"><span class="e-ico">🏖️</span>Nenhuma férias registrada para '+f.nome+'.</div>'}else{todas.forEach(x=>{const cor=corFuncionario(f.nome);const pct=Math.min(100,Math.max(4,(x.dias/30)*100));body+='<div class="pf-list-item" style="cursor:default"><div style="flex:1"><div class="pli-main">'+fmtData(x.inicio)+' a '+fmtData(x.fim)+'</div><div class="pli-sub">'+x.dias+' dias</div><div style="height:10px;background:#eef2f8;border-radius:6px;margin-top:6px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:'+cor+';border-radius:6px"></div></div></div></div>'})}abrirMG('Desempenho de férias de '+f.nome,body,'<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>')}
+function controleFerias(){const f=perfilFunc;if(!f)return;const todas=load('ferias').filter(x=>x.nome===f.nome).sort((a,b)=>b.fim.localeCompare(a.fim));const ult=todas[0];const hoje=new Date();let html='<div class="alert-info"><b>Direito a férias</b>Após 12 meses de trabalho, o funcionário adquire direito a 30 dias de férias.</div>';if(!ult){html+='<div class="alert-info" style="background:var(--laranja-claro);border-color:#f2dfc3;color:var(--laranja)"><b>Sem férias registradas</b>Nenhum período lançado. As férias ficam liberadas após o 12º mês de contrato.</div>'}else{const ultFim=new Date(ult.fim);const prox=new Date(ultFim);prox.setFullYear(prox.getFullYear()+1);const difMes=Math.round((prox-hoje)/86400000/30);const pode=difMes<=0;html+='<div class="alert-info"><b>Últimas férias</b>'+fmtData(ult.inicio)+' a '+fmtData(ult.fim)+' ('+ult.dias+' dias)</div>';if(pode){html+='<div class="alert-info" style="background:var(--verde-claro);border-color:#bfe6d1;color:var(--verde)"><b>✅ Pode tirar férias</b>Já completou o novo período aquisitivo.</div>'}else{html+='<div class="alert-info" style="background:var(--laranja-claro);border-color:#f2dfc3;color:var(--laranja)"><b>⏳ Ainda não pode tirar</b>Próxima liberação em aproximadamente '+Math.abs(difMes)+' mês(es), a partir de '+fmtData(isoDe(prox))+'.</div>'}}abrirMG('Controle de férias de '+f.nome,html,'<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>')}
+/* ===== FERIADOS ===== */
+let feriadoEditando=-1;
+function novaFeriado(){feriadoEditando=-1;document.getElementById('feri-titulo').textContent='Cadastrar Feriado';document.getElementById('feri-excluir-btn').style.display='none';document.getElementById('feri-nome').value='';document.getElementById('feri-data').value='';abrirModal('modal-feriado')}
+function abrirEditarFeriado(i){const d=load('feriados'),f=d[i];if(!f)return;feriadoEditando=i;document.getElementById('feri-nome').value=f.nome;document.getElementById('feri-data').value=f.data;document.getElementById('feri-tipo').value=f.tipo||'Nacional';document.getElementById('feri-titulo').textContent='Editar Feriado';document.getElementById('feri-excluir-btn').style.display='inline-flex';abrirModal('modal-feriado')}
+function salvarFeriado(){const nome=document.getElementById('feri-nome').value.trim(),data=document.getElementById('feri-data').value,tipo=document.getElementById('feri-tipo').value;if(!nome||!data){alert('Preencha nome e data');return}const d=load('feriados');const obj={nome,data,tipo};if(feriadoEditando>=0)d[feriadoEditando]=obj;else d.push(obj);save('feriados',d);feriadoEditando=-1;fecharModal('modal-feriado');renderTudo()}
+function abrirExcluirFeriado(i){fecharModal('modal-feriado');const f=load('feriados')[i];abrirConfirm('Excluir feriado','Deseja excluir o feriado "'+(f?f.nome:'')+'"?',function(){excluirFeriadoNow(i)})}
+function excluirFeriado(i){abrirExcluirFeriado(i)}
+function excluirFeriadoNow(i){const d=load('feriados');if(!d[i])return;d.splice(i,1);save('feriados',d);fecharModal('modal-feriado');renderTudo()}
+function renderFeriados(){const d=load('feriados');const anoSel=document.getElementById('ano-base'),anos=[...new Set(d.map(f=>f.data.slice(0,4)))].sort();anoSel.innerHTML=anos.length?anos.map(a=>'<option>'+a+'</option>').join(''):'<option>'+new Date().getFullYear()+'</option>';const filtro=anos.includes(anoSel.value)?d.filter(f=>f.data.slice(0,4)===anoSel.value):d;document.getElementById('tbl-feriados').innerHTML=filtro.length?filtro.map((f,i)=>'<tr><td>'+fmtData(f.data)+'</td><td>'+f.nome+'</td><td><span class="badge tipo">'+f.tipo+'</span></td><td><div class="row-actions"><button title="Editar" onclick="abrirEditarFeriado('+i+')">✏️</button><button title="Excluir" class="danger" onclick="excluirFeriado('+i+')">🗑️</button></div></td></tr>').join(''):'<tr><td colspan="4"><div class="empty"><span class="e-ico">🎉</span>Nenhum feriado cadastrado.</div></td></tr>';renderCalendario()}
+/* ===== PERFIL (tela cheia) ===== */
+let perfilFunc=null,perfilNav='ponto';
+function abrirPerfil(idx){const d=getFuncionarios(),f=d[idx];if(!f)return;perfilFunc=f;perfilNav='ponto';const cor=corFuncionario(f.nome);document.getElementById('pf-avatar').textContent=iniciais(f.nome);document.getElementById('pf-avatar').style.background=cor;document.getElementById('pf-nome').textContent=f.nome;document.getElementById('pf-cargo').textContent=(f.cargo||'Cargo não informado')+' • '+(f.contrato||'');document.getElementById('pf-dep').textContent=f.departamento||'Departamento não informado';document.getElementById('pf-titulo').textContent='Perfil de '+f.nome;renderPerfilNav();setPerfilNav('ponto');document.getElementById('perfil-overlay').classList.add('open')}
+function fecharPerfil(){const o=document.getElementById('perfil-overlay');if(o)o.classList.remove('open')}
+const PF_NAV=[{k:'ponto',l:'Ponto',i:'🕐',c:'#2f9e6e'},{k:'escala',l:'Escala',i:'📅',c:'#7a5cc4'},{k:'ferias',l:'Férias',i:'🏖️',c:'#d9822b'},{k:'atestado',l:'Atestado',i:'🩺',c:'#d64545'},{k:'dados',l:'Dados Cadastrais',i:'📋',c:'#0055a4'}];
+function renderPerfilNav(){document.getElementById('pf-nav').innerHTML=PF_NAV.map(n=>'<div class="pf-nav-item '+(perfilNav===n.k?'active':'')+'" onclick="setPerfilNav(\''+n.k+'\')"><span class="pni-ico" style="background:'+n.c+'">'+n.i+'</span><span class="pni-label">'+n.l+'</span></div>').join('')}
+function setPerfilNav(k){const nav=PF_NAV.find(n=>n.k===k);if(!nav)return;perfilNav=k;renderPerfilNav();document.getElementById('pf-secao-ico').style.background=nav.c;document.getElementById('pf-secao-ico').textContent=nav.i;document.getElementById('pf-secao-titulo').textContent=nav.l;renderPerfilCards()}
+function card(ico,cor,label,sub,fn){return '<div class="pf-card" onclick="'+fn+'"><span class="pc-ico" style="background:'+cor+'">'+ico+'</span><span class="pc-txt"><span class="pc-label">'+label+'</span><span class="pc-sub">'+sub+'</span></span></div>'}
+function renderPerfilCards(){const f=perfilFunc;if(!f)return;let cards='';
+if(perfilNav==='ponto'){const p=getPontoDe(f.id);cards=card('➕','#1e9e8e','Cadastrar ponto',(p?'Expediente já existe, use Editar':'Entrada, almoço e saída'),'novaPontoDoPerfil()')+card('✏️','#1e6fd9','Editar ponto','Alterar os horários','editarPontoDoPerfil()')+card('🗑️','#d64545','Excluir ponto','Remover o expediente','excluirPontoDoPerfil()')+card('👁️','#3aa0c9','Visualizar ponto','Abrir na linha do tempo','visualizarPontoDoPerfil()')+card('🖨️','#5c6b7d','Imprimir ponto','Gerar impressão','imprimirPonto()')}
+else if(perfilNav==='escala'){cards=card('🪟','#7a5cc4','Alocar na escala','Definir senha, guichê, fixo ou apelido','abrirAlterarEscalaPerfil()')+card('👁️','#3aa0c9','Visualizar escala','Ver configuração atual','visualizarEscalaPerfil()')+card('🖨️','#5c6b7d','Imprimir escala','Gerar impressão','imprimirEscala()')}
+else if(perfilNav==='ferias'){cards=card('➕','#d9822b','Incluir férias','Lançar novo período','novaFeriasDoPerfil()')+card('✏️','#b7791f','Editar férias','Alterar um período','editarFeriasDoPerfil()')+card('🗑️','#d64545','Excluir férias','Remover um período','excluirFeriasDoPerfil()')+card('📈','#3aa0c9','Desempenho','Linha do tempo do funcionário','desempenhoFerias()')+card('🎯','#e05a6a','Controle','Última e próxima férias','controleFerias()')}
+else if(perfilNav==='atestado'){cards=card('➕','#d64545','Incluir falta/abono/atestado','Lançar ocorrência','novaAtestado()')+card('📋','#b7791f','Gerir ocorrências','Listar e excluir','gerirAtestados()')+card('📊','#1e6fd9','Controle do mês','Abonos, faltas e atestados','controleAtestados()')+card('📈','#2f9e6e','Frequência','Percentual de presença','frequenciaAtestado()')}
+else if(perfilNav==='dados'){cards=card('🆔','#0055a4','Matrícula','Incluir ou editar','cardMatricula()')+card('➕','#1e6fd9','Incluir cargo','Adicionar cargo','abrirCargoCadastro()')+card('✏️','#b7791f','Editar cargo','Renomear cargo','cardEditarCargo()')+card('➕','#2f9e6e','Incluir departamento','Adicionar departamento','abrirDepCadastro()')+card('📋','#7a5cc4','Gerir departamento','Listar e remover','cardGerirDep()')}
+document.getElementById('pf-cards').innerHTML=cards}
+function novaPontoDoPerfil(){abrirModalPonto(perfilFunc.id)}
+function editarPontoDoPerfil(){const p=getPontoDe(perfilFunc.id);if(!p){abrirMG('Editar ponto','<div class="pf-empty"><span class="e-ico">🕐</span>Nenhum ponto cadastrado para '+perfilFunc.nome+'. Use "Cadastrar ponto".</div>','<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>');return}abrirModalPonto(perfilFunc.id)}
+function excluirPontoDoPerfil(){const p=getPontoDe(perfilFunc.id);if(!p){abrirMG('Excluir ponto','<div class="pf-empty"><span class="e-ico">🕐</span>Nenhum ponto cadastrado para '+perfilFunc.nome+'.</div>','<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>');return}abrirExcluirPonto()}
+function visualizarPontoDoPerfil(){document.getElementById('ponto-busca').value=perfilFunc.nome;fecharPerfil();go('ponto')}
+function abrirAlterarEscalaPerfil(){abrirAlterarEscala(perfilFunc.id)}
+function visualizarEscalaPerfil(){const cfg=getEscalaConfig(perfilFunc.id);abrirMG('Escala de '+perfilFunc.nome,'<div class="pf-list-item" style="cursor:default"><div><div class="pli-main">Local de trabalho</div><div class="pli-sub"><span class="badge '+(cfg.local==='guiche'?'guiche':'senha')+'">'+(cfg.local==='guiche'?'🪟 Guichê':'🎫 Senha')+'</span> '+(cfg.fixo?'<span class="badge ok">🔒 Fixo no guichê</span>':'<span class="badge tipo">Não é fixo</span>')+(cfg.apelido?' • Apelido: <b>'+cfg.apelido+'</b>':'')+'</div></div></div>','<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>')}
+function novaFeriasDoPerfil(){novaFerias();const sel=document.getElementById('fer-func');if(perfilFunc){const opt=[...sel.options].find(o=>o.value===String(perfilFunc.id));if(!opt){sel.innerHTML='<option value="'+perfilFunc.id+'">'+perfilFunc.nome+'</option>'+sel.innerHTML}sel.value=String(perfilFunc.id)}}
+function editarFeriasDoPerfil(){const fer=load('ferias').filter(x=>x.nome===perfilFunc.nome);if(!fer.length){abrirMG('Editar férias','<div class="pf-empty"><span class="e-ico">🏖️</span>Nenhuma férias registrada para '+perfilFunc.nome+'.</div>','<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>');return}const body=fer.map(x=>'<div class="pf-list-item" onclick="abrirEditarFerias('+load('ferias').indexOf(x)+');fecharModal(\'modal-generic\')"><div><div class="pli-main">'+fmtData(x.inicio)+' a '+fmtData(x.fim)+'</div><div class="pli-sub">'+x.dias+' dias</div></div><span style="color:var(--azul)">✏️</span></div>').join('');abrirMG('Selecione as férias para editar',body,'<button class="btn" onclick="fecharModal(\'modal-generic\')">Cancelar</button>')}
+function excluirFeriasDoPerfil(){const fer=load('ferias').filter(x=>x.nome===perfilFunc.nome);if(!fer.length){abrirMG('Excluir férias','<div class="pf-empty"><span class="e-ico">🏖️</span>Nenhuma férias registrada para '+perfilFunc.nome+'.</div>','<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>');return}const body=fer.map(x=>'<div class="pf-list-item" onclick="excluirFerias('+load('ferias').indexOf(x)+')"><div><div class="pli-main">'+fmtData(x.inicio)+' a '+fmtData(x.fim)+'</div><div class="pli-sub">'+x.dias+' dias</div></div><span style="color:var(--vermelho)">🗑️</span></div>').join('');abrirMG('Selecione as férias para excluir',body,'<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Fechar</button>')}
+/* ===== ATESTADOS / FALTAS / ABONOS ===== */
+function novaAtestado(){const body='<div class="field"><label>Tipo</label><select id="at-tipo"><option value="Atestado">🩺 Atestado</option><option value="Falta">❌ Falta</option><option value="Abono">✅ Abono</option></select></div><div class="field"><label>Data</label><input type="date" id="at-data" value="'+hojeISO()+'"></div><div class="field"><label>Dias</label><input type="number" id="at-dias" min="1" value="1"></div><div class="field"><label>Observação</label><input id="at-obs" placeholder="Opcional"></div>';abrirMG('Incluir falta / abono / atestado de '+perfilFunc.nome,body,'<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Cancelar</button><button class="btn" onclick="salvarAtestado()">Salvar</button>')}
+function salvarAtestado(){const tipo=document.getElementById('at-tipo').value,data=document.getElementById('at-data').value,dias=parseInt(document.getElementById('at-dias').value)||1,obs=document.getElementById('at-obs').value.trim();const at=load('atestados');at.push({matricula:perfilFunc.id,nome:perfilFunc.nome,tipo,data,dias,obs});save('atestados',at);fecharModal('modal-generic');renderTudo()}
+function excluirAtestado(i){const at=load('atestados'),a=at[i];if(!a)return;abrirConfirm('Excluir ocorrência','Deseja excluir '+a.tipo+' de '+fmtData(a.data)+'?',function(){const d=load('atestados');if(!d[i])return;d.splice(i,1);save('atestados',d);renderTudo()})}
+function gerirAtestados(){const at=load('atestados').filter(x=>String(x.matricula)===String(perfilFunc.id)).sort((a,b)=>b.data.localeCompare(a.data));const body=at.length?at.map(x=>{const idx=load('atestados').indexOf(x);return '<div class="pf-list-item" style="cursor:default"><div><div class="pli-main">'+x.tipo+'</div><div class="pli-sub">'+fmtData(x.data)+(x.dias?' • '+x.dias+' dias':'')+(x.obs?' • '+x.obs:'')+'</div></div><div class="row-actions"><button title="Excluir" class="danger" onclick="excluirAtestado('+idx+')">🗑️</button></div></div>'}).join(''):'<div class="pf-empty"><span class="e-ico">🩺</span>Nenhuma ocorrência registrada.</div>';abrirMG('Gerir faltas / abonos / atestados de '+perfilFunc.nome,body,'<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>')}
+function controleAtestados(){const at=load('atestados').filter(x=>String(x.matricula)===String(perfilFunc.id));const agora=new Date(),mesAtual=MESES[agora.getMonth()],anoAtual=agora.getFullYear();const doMes=at.filter(x=>{const p=x.data.split('-');return MESES[(+p[1])-1]===mesAtual&&p[0]==String(anoAtual)});const cFalta=doMes.filter(x=>x.tipo==='Falta').length,cAbono=doMes.filter(x=>x.tipo==='Abono').length,cAtest=doMes.filter(x=>x.tipo==='Atestado').length;const html='<div class="stats-sum"><div class="ss-item"><div class="ss-num" style="color:var(--vermelho)">'+cFalta+'</div><div class="ss-label">Faltas</div></div><div class="ss-item"><div class="ss-num" style="color:var(--verde)">'+cAbono+'</div><div class="ss-label">Abonos</div></div><div class="ss-item"><div class="ss-num" style="color:var(--azul)">'+cAtest+'</div><div class="ss-label">Atestados</div></div><div class="ss-item"><div class="ss-num">'+(cFalta+cAbono+cAtest)+'</div><div class="ss-label">Total no mês</div></div></div><div style="margin-top:10px;font-size:11px;color:var(--texto-suave)">Referente a '+mesAtual+' de '+anoAtual+'.</div>';abrirMG('Controle de ocorrências de '+perfilFunc.nome,html,'<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>')}
+function frequenciaAtestado(){const at=load('atestados').filter(x=>String(x.matricula)===String(perfilFunc.id)&&x.tipo==='Falta');const agora=new Date(),mesAtual=MESES[agora.getMonth()],anoAtual=agora.getFullYear();const faltasMes=at.filter(x=>{const p=x.data.split('-');return MESES[(+p[1])-1]===mesAtual&&p[0]==String(anoAtual)}).reduce((s,x)=>s+(x.dias||1),0);const diasUteis=22;const freq=Math.max(0,Math.round(((diasUteis-faltasMes)/diasUteis)*100));const cor=freq>=90?'var(--verde)':freq>=70?'var(--laranja)':'var(--vermelho)';const html='<div style="text-align:center;padding:10px"><div style="font-size:44px;font-weight:800;color:'+cor+'">'+freq+'%</div><div style="font-size:11px;color:var(--texto-suave);margin-top:4px">Frequência em '+mesAtual+' de '+anoAtual+'</div><div style="height:12px;background:#eef2f8;border-radius:8px;margin-top:14px;overflow:hidden"><div style="width:'+freq+'%;height:100%;background:'+cor+';border-radius:8px"></div></div><div style="margin-top:10px;font-size:11px;color:var(--texto-suave)">Base: ~'+diasUteis+' dias úteis • '+faltasMes+' falta(s) registrada(s)</div></div>';abrirMG('Frequência de '+perfilFunc.nome,html,'<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>')}
+/* ===== DADOS CADASTRAIS ===== */
+function cardMatricula(){const body='<div class="field"><label>Matrícula</label><input id="cm-mat" value="'+perfilFunc.matricula+'"></div><div class="alert-info"><b>Importante</b>O novo valor passa a valer para os próximos lançamentos.</div>';abrirMG('Matrícula de '+perfilFunc.nome,body,'<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Cancelar</button><button class="btn" onclick="salvarMatricula()">Salvar</button>')}
+function salvarMatricula(){const nova=document.getElementById('cm-mat').value.trim();if(!nova){alert('Informe a matrícula');return}const d=getFuncionarios();const i=d.findIndex(x=>String(x.id)===String(perfilFunc.id));if(i>=0){d[i].matricula=nova;save('funcionarios',d);perfilFunc=d[i];fecharModal('modal-generic');renderTudo();abrirPerfil(i)}}
+function cardGerirDep(){const deps=load('departamentos');const body=deps.length?deps.map(d=>'<div class="pf-list-item" style="cursor:default"><div class="pli-main">'+d+'</div><button class="btn btn-small btn-danger" onclick="excluirDepartamento(\''+d.replace(/'/g,"\\'")+'\')">Excluir</button></div>').join(''):'<div class="pf-empty"><span class="e-ico">🏢</span>Nenhum departamento cadastrado.</div>';abrirMG('Gerir departamentos',body,'<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>')}
+function excluirDepartamento(nome){abrirConfirm('Excluir departamento','Deseja excluir o departamento "'+nome+'" do sistema?',function(){const d=load('departamentos');const i=d.indexOf(nome);if(i>=0)d.splice(i,1);save('departamentos',d);fecharModal('modal-generic');renderTudo()})}
+/* ===== HOME ===== */
+function renderHome(){const d=getFuncionarios();const grid=document.getElementById('func-grid');if(!d.length){grid.innerHTML='<div class="empty"><span class="e-ico">👥</span>Nenhum funcionário cadastrado. Use o módulo Funcionários.</div>';return}grid.innerHTML=d.map((f,i)=>{const cor=corFuncionario(f.nome);return '<div class="func-card" onclick="abrirPerfil('+i+')"><div class="func-avatar" style="background:'+cor+'">'+iniciais(f.nome)+'</div><div class="func-info"><div class="fn">'+f.nome+'</div><div class="fm">'+(f.cargo||'-')+(f.departamento?' • '+f.departamento:'')+(f.contrato?' • '+f.contrato:'')+'</div></div><span style="font-size:11px;color:var(--azul)">👁️</span></div>'}).join('')}
+document.addEventListener('wheel',function(e){const t=e.target.closest?e.target.closest('#gantt-ferias'):null;if(t){e.preventDefault();feriasNav(e.deltaY>0?1:-1)}},{passive:false});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));fecharPerfil()}});
+function renderTudo(){renderHome();renderFuncionarios();renderPonto();renderPontos();renderEscala();renderEscalas();renderFerias();renderHistFerias();renderFeriados();renderCalendario()}
+renderTudo();
+</script>
+</body>
+</html>
