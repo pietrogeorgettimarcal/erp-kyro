@@ -8,6 +8,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <style>
@@ -338,12 +340,36 @@ a{text-decoration:none;color:inherit}
 </div>
 </div>
 <script>
-/* ===== CHAVES DO PORTAL-RH (sincronização) ===== */
-const KEYS={funcionarios:'kyro_funcionarios',cargos:'kyro_cargos',departamentos:'kyro_departamentos',pontos:'kyro_pontos_salvos',escalas:'kyro_escalas_salvas',escala_hist:'kyro_escala_hist',ferias:'kyro_ferias',feriados:'kyro_feriados',atestados:'kyro_atestados',contratos:'kyro_contratos',quantidades:'kyro_quantidades'};
+/* ===== FIREBASE (mesmo banco do Portal RH — tempo real) ===== */
+const firebaseConfig = {
+  apiKey: "AIzaSyBQ7_k7huhS8oAyKp0OsbEajXFmrNxcrlo",
+  authDomain: "kyro-7cb7a.firebaseapp.com",
+  databaseURL: "https://kyro-7cb7a-default-rtdb.firebaseio.com",
+  projectId: "kyro-7cb7a",
+  storageBucket: "kyro-7cb7a.firebasestorage.app",
+  messagingSenderId: "368737182812",
+  appId: "1:368737182812:web:7be81b22a1a1fec5c97299",
+  measurementId: "G-1XKDHWVEVE"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const KEYS={funcionarios:'kyro_funcionarios',cargos:'kyro_cargos',departamentos:'kyro_departamentos',secretarias:'kyro_secretarias',pontos:'kyro_pontos_salvos',escalas:'kyro_escalas_salvas',escala_hist:'kyro_escala_hist',ferias:'kyro_ferias',feriados:'kyro_feriados',atestados:'kyro_atestados',contratos:'kyro_contratos',quantidades:'kyro_quantidades'};
 const CONFIG_DB_KEY='escala_config_v23';
 const MODELS_DB_KEY='escala_modelos_v1';
-function load(k){try{return JSON.parse(localStorage.getItem(KEYS[k]))||[]}catch(e){return[]}}
-function save(k,d){localStorage.setItem(KEYS[k],JSON.stringify(d))}
+const _cache={};
+let _loaded=0;
+const _total=Object.keys(KEYS).length;
+Object.keys(KEYS).forEach(k=>{
+  db.ref(KEYS[k]).on('value',snap=>{
+    _cache[k]=snap.val()||[];
+    _loaded++;
+    if(_loaded>=_total){
+      try{carregarDadosMestre();atualizarUI();}catch(e){}
+    }
+  });
+});
+function load(k){return _cache[k]||[];}
+function save(k,d){_cache[k]=d; db.ref(KEYS[k]).set(d);}
 const DEFAULT_OBS_TEXT='<div style="text-align:center;"><b>Obs.: A escala poderá sofrer alterações.</b></div><div style="text-align:center;"><b>Na abertura dos guichês, 1° e 2° suplentes, permanecerão atendendo até às 09:30 ou a fila zerar.</b></div>';
 const DEFAULT_STRUCTURE=[
 {title:"",grayTitle:false,cols:[{key:'dataLabel',label:'DIAS',type:'system',grayHeader:false,grayBody:false},{key:'semLabel',label:'DIAS SEM.',type:'system',grayHeader:false,grayBody:false},{key:'senha',label:'SENHA',type:'system',grayHeader:false,grayBody:false}]},
@@ -352,25 +378,31 @@ const DEFAULT_STRUCTURE=[
 {title:"15 SENHAS OU 20 MIN E ALMOÇO",grayTitle:false,cols:[{key:'sup3',label:'3° SUPLENTE',type:'suplente',grayHeader:false,grayBody:false},{key:'sup4',label:'4° SUPLENTE',type:'suplente',grayHeader:false,grayBody:false}]},
 {title:"ACIMA 20 MINUTOS, ALMOÇO, QUANDO NECESSÁRIO",grayTitle:false,cols:[{key:'sup5',label:'5° SUPLENTE',type:'suplente',grayHeader:false,grayBody:true},{key:'sup6',label:'6° SUPLENTE',type:'suplente',grayHeader:false,grayBody:true}]}
 ];
-/* ===== DADOS MESTRE (lidos do portal-rh, com APELIDO) ===== */
+/* ===== DADOS MESTRE (lidos do FIREBASE do portal-rh) ===== */
 let masterData={funcionarios:[],ferias:[],feriados:[]};
 function nomeNaEscala(f){return (f&&f.apelido&&String(f.apelido).trim())?f.apelido.trim():((f&&f.nome)||'');}
 function carregarDadosMestre(){
   const funcs=load('funcionarios');
   const escalasCfg={};
   load('escalas').forEach(e=>{escalasCfg[String(e.matricula)]=e;});
-  masterData.funcionarios=funcs.map(f=>({
-    nome:f.nome||'',
-    apelido:(escalasCfg[String(f.id)]&&escalasCfg[String(f.id)].apelido)||'',
-    cargo:f.cargo||'',
-    tipo:'escala',
-    categoria:(f.contrato&&String(f.contrato).toLowerCase().indexOf('senha')>=0)?'Funcionário da Senha':'Funcionário'
-  }));
+  const temConfig=Object.keys(escalasCfg).length>0;
+  masterData.funcionarios=funcs.map(f=>{
+    const cfg=escalasCfg[String(f.id)];
+    const isSenha=(cfg&&cfg.local==='senha')||(!cfg&&String(f.contrato||'').toLowerCase().indexOf('senha')>=0);
+    return {
+      nome:f.nome||'',
+      apelido:(cfg&&cfg.apelido)||'',
+      cargo:f.cargo||'',
+      tipo:'escala',
+      naEscala:!!cfg||!temConfig,
+      categoria:isSenha?'Funcionário da Senha':'Funcionário'
+    };
+  });
   masterData.ferias=load('ferias').map(f=>({funcionario:f.nome||'',inicio:f.inicio||'',fim:f.fim||''}));
   masterData.feriados=load('feriados').map(f=>({data:f.data||'',nome:f.nome||''}));
   const selectFunc=document.getElementById('config-func');
   const selectBusca=document.getElementById('busca-func');
-  const lista=masterData.funcionarios.filter(f=>f.tipo==='escala'&&f.categoria!=='Funcionário da Senha');
+  const lista=getFuncionariosEscala();
   if(selectFunc){
     const sel=selectFunc.value;
     selectFunc.innerHTML='<option value="">Funcionário...</option>';
@@ -385,8 +417,11 @@ function carregarDadosMestre(){
   }
 }
 function getFuncionariosEscala(){
-  return masterData.funcionarios.filter(f=>f.tipo==='escala'&&f.categoria!=='Funcionário da Senha')
+  return masterData.funcionarios.filter(f=>f.tipo==='escala'&&f.naEscala&&f.categoria!=='Funcionário da Senha')
     .sort((a,b)=>nomeNaEscala(a).localeCompare(nomeNaEscala(b)));
+}
+function getFuncionariosSenha(){
+  return masterData.funcionarios.filter(f=>f.tipo==='escala'&&f.naEscala&&f.categoria==='Funcionário da Senha');
 }
 function getFuncPorApelido(ap){
   return masterData.funcionarios.find(f=>nomeNaEscala(f)===ap);
@@ -432,12 +467,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   setupEvents();
   atualizarUI();
   carregarObservacaoAtual();
-});
-window.addEventListener('storage',function(e){
-  if(e.key===KEYS.funcionarios||e.key===KEYS.ferias||e.key===KEYS.feriados||e.key===KEYS.escalas){
-    carregarDadosMestre();
-    atualizarUI();
-  }
 });
 function carregarDados(){
   carregarDadosMestre();
@@ -711,20 +740,20 @@ function removerGrupo(gIdx){
 function removerColuna(gIdx,cIdx){appState.structure[gIdx].cols.splice(cIdx,1);salvarEstado();atualizarUI();}
 function adicionarGrupo(){appState.structure.push({title:"NOVO GRUPO",grayTitle:false,cols:[]});salvarEstado();atualizarUI();}
 function adicionarColuna(gIdx){const key='col_'+Date.now()+Math.floor(Math.random()*1000);appState.structure[gIdx].cols.push({key:key,label:"Nova",type:'suplente',grayHeader:false,grayBody:false});salvarEstado();atualizarUI();}
-/* ===== GERAÇÃO DE ESCALA (usando o APELIDO do portal) ===== */
+/* ===== GERAÇÃO DE ESCALA (Firebase + apelido + senha/guichê) ===== */
 function gerarEscala(embaralhar){
   carregarDadosMestre();
   const mes=appState.mes;const ano=appState.ano;const diasNoMes=new Date(ano,mes+1,0).getDate();
   const feriadosStr=masterData.feriados.map(f=>f.data);
   const pool=getFuncionariosEscala();
-  if(pool.length===0)return avisar("Atenção","Nenhum funcionário cadastrado no Portal RH para gerar a escala.");
+  if(pool.length===0)return avisar("Atenção","Nenhum funcionário cadastrado na escala do Portal RH. Cadastre funcionários no módulo Escala do portal (com apelido) para gerar.");
   const flatCols=getFlatColumns();
   const slotsKeys=flatCols.filter(c=>c.type!=='system').map(c=>c.key);
   const stats={};const colStats={};
   pool.forEach(f=>{const n=nomeNaEscala(f);stats[n]={total:0};colStats[n]={};slotsKeys.forEach(k=>colStats[n][k]=0);});
   const novaEscala=[];
   let senhaIdx=0;
-  const poolSenha=masterData.funcionarios.filter(f=>f.tipo==='escala'&&f.categoria==='Funcionário da Senha');
+  const poolSenha=getFuncionariosSenha();
   let randomSeed=12345;
   const pseudoRandom=()=>{randomSeed=(randomSeed*9301+49297)%233280;return randomSeed/233280;};
   const getRandom=()=>embaralhar?Math.random():pseudoRandom();
@@ -883,7 +912,7 @@ function mudarMes(d){
   const ai=document.getElementById('ano-input');if(ai)ai.value=appState.ano;
   atualizarUI();
 }
-/* ===== BACKUP (portal-rh) ===== */
+/* ===== BACKUP (Firebase) ===== */
 function importarDados(e){
   const f=e.target.files[0];
   if(!f)return;
@@ -1008,7 +1037,7 @@ function abrirModalCelula(idx,key){
   }else{
     modalSelect.innerHTML='<option value="">(Vazio)</option>';
     let list=[];
-    if(key==='senha'){list=masterData.funcionarios.filter(f=>f.tipo==='escala'&&f.categoria==='Funcionário da Senha').map(f=>nomeNaEscala(f));}
+    if(key==='senha'){list=getFuncionariosSenha().map(f=>nomeNaEscala(f));}
     else{list=getFuncionariosEscala().map(f=>nomeNaEscala(f));}
     list.sort();
     list.forEach(nome=>{const opt=new Option(nome,nome);if(nome===valorAtual)opt.selected=true;modalSelect.add(opt);});
@@ -1025,7 +1054,7 @@ function salvarEdicaoManual(){
   salvarEstado();atualizarUI();
   fecharModal('modal-edicao');
 }
-/* ===== EXPORTAR EXCEL (com apelidos) ===== */
+/* ===== EXPORTAR EXCEL ===== */
 async function exportarExcelOriginal(){
   if(appState.escala.length===0)return avisar("Atenção","Gere a escala primeiro antes de exportar.");
   const mesNome=document.getElementById('mes-select').options[appState.mes].text.toUpperCase();
@@ -1107,7 +1136,7 @@ async function exportarExcelOriginal(){
   const buffer=await wb.xlsx.writeBuffer();
   saveAs(new Blob([buffer]),'Escala_'+mesNome+'_'+ano+'.xlsx');
 }
-/* ===== EXPORTAR PDF (com apelidos) ===== */
+/* ===== EXPORTAR PDF ===== */
 function exportarPDFOriginal(){
   if(appState.escala.length===0)return avisar("Atenção","Gere a escala primeiro antes de exportar.");
   const {jsPDF}=window.jspdf;
