@@ -224,7 +224,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const fdb = firebase.database();
-const F_KEYS = {funcionarios:'kyro_funcionarios', ferias:'kyro_ferias', feriados:'kyro_feriados'};
+const F_KEYS = {funcionarios:'kyro_funcionarios', ferias:'kyro_ferias', feriados:'kyro_feriados', pontos:'kyro_pontos_salvos', contratos_ponto:'kyro_contratos_ponto'};
 let F_CACHE = {};
 let _fLoaded = 0;
 const _fTotal = Object.keys(F_KEYS).length;
@@ -239,7 +239,7 @@ Object.keys(F_KEYS).forEach(k=>{
 const URL_PARAMS = (function(){const p=new URLSearchParams(location.search);return {funcionario:p.get('funcionario'),inicio:p.get('inicio'),fim:p.get('fim'),excel:p.get('excel')||''};})();
 let paramsAplicados=false;
 /* ===== CONFIGURAÇÃO ===== */
-const LS_KEYS = { pontoInicio: 'controlePonto_pontoInicio', pontoFim: 'controlePonto_pontoFim' };
+const LS_KEYS = { pontoInicio: 'controlePonto_mesInicio', pontoFim: 'controlePonto_mesFim' };
 let PESSOAS = [];
 let DB_PESSOAS = {};
 let FERIADOS_DB = {};
@@ -248,7 +248,34 @@ let FERIAS = {};
 let PONTO_INICIO = '';
 let PONTO_FIM = '';
 let PERIODOS = [];
-function ehEstagiarioInfo(info){return info&&(info.vinculo==='Estagiário'||info.tipo==='Estagiário')}
+function normTxt(t){return String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()}
+function ehEstagiarioContrato(c){return normTxt(c).includes('estagi')}
+function ehEstagiarioInfo(info){return !!info&&ehEstagiarioContrato(info.vinculo)}
+function nivelEstagio(c){const n=normTxt(c);if(n.includes('medio'))return 'Médio';if(n.includes('superior'))return 'Superior';return ''}
+/* Regras de competência — mesmas do portal-rh.html */
+const PADRAO_DIA_INI={'Efetivo':11,'Estagiário de Ensino Superior':16,'Estagiário de Ensino Médio':26};
+function regraPontoContrato(contrato){
+  const r=(F_CACHE.contratos_ponto||[]).find(p=>p&&String(p.contrato)===String(contrato));
+  if(r&&r.diaIni)return {diaIni:+r.diaIni,diaFim:+r.diaFim};
+  const c=String(contrato||'').trim();
+  let di=PADRAO_DIA_INI[c];
+  if(!di){const n=normTxt(c);if(n.includes('estagi')&&n.includes('medio'))di=26;else if(n.includes('estagi'))di=16;else di=11;}
+  return {diaIni:di,diaFim:di-1};
+}
+function qtdAutoContrato(ct){return (ct==='Efetivo'||ct==='Comissionado'||ct==='Emergencial')?6:4}
+function horasDoPonto(h){const tm=x=>{const[a,b]=String(x||'0:0').split(':');return (+a||0)*60+(+b||0)};let tot=0;for(let i=0;i+1<h.length;i+=2)tot+=Math.max(0,tm(h[i+1])-tm(h[i]));return Math.round(tot/60*100)/100}
+function fmtHoras(h){if(!h)return '';const hh=Math.floor(h),mm=Math.round((h-hh)*60);return String(hh).padStart(2,'0')+(mm?':'+String(mm).padStart(2,'0'):'')}
+function ultimoDia(a,m){return new Date(a,m+1,0).getDate()}
+function isoYMD(a,m,d){const dt=new Date(a,m,Math.min(d,ultimoDia(a,m)));return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0')}
+/* Competência: começa no diaIni do MÊS DE INÍCIO e termina no diaFim do MÊS DE TÉRMINO */
+function periodoDoContrato(contrato,mesIni,mesFim){
+  const rg=regraPontoContrato(contrato);
+  const[a1,m1]=mesIni.split('-').map(Number),[a2,m2]=mesFim.split('-').map(Number);
+  const mesmo=(a1===a2&&m1===m2);
+  return {inicio:isoYMD(a1,m1-1,rg.diaIni),fim:isoYMD(a2,mesmo?m2:m2-1,rg.diaFim)};
+}
+const MESES_NOME=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+function formatarMesBR(ym){if(!ym)return '--/----';const[a,m]=ym.split('-');return m+'/'+a}
 /* ===== FERIADOS (fallback automático de Limeira) ===== */
 function getPascoa(ano){
   const f=Math.floor,G=ano%19,C=f(ano/100),H=(C-f(C/4)-f((8*C+13)/25)+19*G+15)%30,
@@ -290,10 +317,15 @@ function carregarDados(){
   PESSOAS=[];DB_PESSOAS={};
   funcs.forEach(f=>{
     PESSOAS.push(f.nome);
+    const rec=(F_CACHE.pontos||[]).find(p=>p&&(String(p.funcId)===String(f.id)||(!p.funcId&&p.nome===f.nome)));
+    const hs=(rec&&rec.horarios&&rec.horarios.length)?rec.horarios.map(x=>x.time).filter(Boolean):[];
+    const qtd=hs.length||qtdAutoContrato(f.contrato);
     DB_PESSOAS[f.nome]={
-      matricula:f.matricula||'',admissao:'',funcao:'',
-      vinculo:f.contrato||'Funcionário',tipo:'ponto',
-      secretaria:f.secretaria||'',departamento:f.departamento||''
+      id:f.id,matricula:f.matricula||'',admissao:'',funcao:f.cargo||'',cargo:f.cargo||'',
+      vinculo:f.contrato||'Funcionário',contrato:f.contrato||'',tipo:'ponto',
+      secretaria:f.secretaria||'',departamento:f.departamento||'',
+      nivel:nivelEstagio(f.contrato),qtdHorarios:qtd,horarios:hs,
+      horasDia:hs.length?(rec.horas||horasDoPonto(hs)):0
     };
   });
   PESSOAS.sort();
@@ -310,8 +342,8 @@ function processarParams(){
   if(!PESSOAS.length)return;
   paramsAplicados=true;
   const pi=document.getElementById('periodo-inicio'),pf=document.getElementById('periodo-fim');
-  if(URL_PARAMS.inicio&&pi)pi.value=URL_PARAMS.inicio;
-  if(URL_PARAMS.fim&&pf)pf.value=URL_PARAMS.fim;
+  if(URL_PARAMS.inicio&&pi)pi.value=URL_PARAMS.inicio.slice(0,7);
+  if(URL_PARAMS.fim&&pf)pf.value=(URL_PARAMS.fim===URL_PARAMS.inicio||!URL_PARAMS.inicio?URL_PARAMS.fim:URL_PARAMS.inicio).slice(0,7);
   atualizarDadosPonto();
   if(URL_PARAMS.excel==='1')setTimeout(()=>{exportarHTMLparaExcel()},1200);
 }
@@ -330,79 +362,72 @@ function verificarFerias(nomePessoa,dataISO){
   const t=new Date(dataISO+"T00:00:00Z").getTime();
   return periodos.some(p=>{const i=new Date(p.inicio+"T00:00:00Z").getTime(),f=new Date(p.fim+"T00:00:00Z").getTime();return t>=i&&t<=f});
 }
+/* Regra de emenda: um dia é "especial" quando é feriado (inclusive PF) ou folga (fim de semana) */
+function diaEspecial(dataISO,diaSemana){
+  if(verificarFeriado(dataISO))return true;
+  if(diaSemana==="Sábado"||diaSemana==="Domingo")return true;
+  return false;
+}
 function simularMarcacoes(nomePessoa,dataISO,diaSemana){
-  const feriado=verificarFeriado(dataISO),ferias=verificarFerias(nomePessoa,dataISO);
+  let feriado=verificarFeriado(dataISO);const ferias=verificarFerias(nomePessoa,dataISO);
+  if(!feriado&&diaSemana!=="Sábado"&&diaSemana!=="Domingo"){/* Emenda: apenas DIA ÚTIL entre dois dias especiais (feriado, PF ou folga) vira PF automaticamente. Feriado e folga permanecem como estão. */
+    const d=new Date(dataISO+"T00:00:00Z"),ant=new Date(d),pos=new Date(d);
+    ant.setUTCDate(d.getUTCDate()-1);pos.setUTCDate(d.getUTCDate()+1);
+    const iso=x=>x.toISOString().slice(0,10);
+    const dsAnt=getDiaDaSemana(ant),dsPos=getDiaDaSemana(pos);
+    if(diaEspecial(iso(ant),dsAnt)&&diaEspecial(iso(pos),dsPos))feriado={nome:'Emenda de feriado (PF)',tipo:'Ponto Facultativo'};
+  }
   const m={e1:"",s1:"",e2:"",s2:"",e3:"",s3:"",total:"00:00",classe:"",observacao:""};
   if(ferias){
-    m.e1="FÉRIAS";m.s1="FÉRIAS";m.e2="FÉRIAS";m.s2="FÉRIAS";m.e3="FÉRIAS";m.s3="FÉRIAS";
+    m.e1=m.s1=m.e2=m.s2=m.e3=m.s3="FÉRIAS";
     m.classe="destaque-ferias";m.total="00:00";
   }else if(feriado){
     const tipo=(feriado.tipo||'').toLowerCase(),nome=(feriado.nome||'').toLowerCase();
     const isPF=tipo.includes('facultativo')||nome.includes('facultativo');
     const tx=isPF?"PF":"FERIADO";
-    m.e1=tx;m.s1=tx;m.e2=tx;m.s2=tx;m.e3=tx;m.s3=tx;
+    m.e1=m.s1=m.e2=m.s2=m.e3=m.s3=tx;
     m.classe="destaque-feriado";m.total="00:00";
   }else if(diaSemana==="Sábado"||diaSemana==="Domingo"){
-    m.e1="FOLGA";m.s1="FOLGA";m.e2="FOLGA";m.s2="FOLGA";m.e3="FOLGA";m.s3="FOLGA";
+    m.e1=m.s1=m.e2=m.s2=m.e3=m.s3="FOLGA";
     m.classe="destaque-folga";m.total="00:00";
   }
   return m;
 }
 /* ===== PERÍODOS E CONTROLES ===== */
-function gerarPeriodos(){
-  PERIODOS=[];
-  const hoje=new Date();
-  let base=new Date(hoje.getFullYear(),hoje.getMonth(),11);
-  if(hoje.getDate()<11)base.setMonth(base.getMonth()-1);
-  for(let i=0;i<24;i++){
-    let ini=new Date(base);ini.setMonth(ini.getMonth()-1);
-    let fim=new Date(base);fim.setDate(fim.getDate()-1);
-    PERIODOS.push({inicio:formatarDataISO(ini),fim:formatarDataISO(fim)});
-    base.setMonth(base.getMonth()-1);
-  }
-}
+function mesAtualYM(){const h=new Date();return h.getFullYear()+'-'+String(h.getMonth()+1).padStart(2,'0')}
 function renderControles(){
   const el=document.getElementById('controles-container');
   if(!el)return;
-  if(!PERIODOS.length)gerarPeriodos();
-  el.innerHTML='<div class="controles-item"><label for="periodo-inicio">Início:</label><input type="date" id="periodo-inicio" class="w-full md:w-auto"></div>'+
-    '<div class="controles-item"><label for="periodo-fim">Fim:</label><input type="date" id="periodo-fim" class="w-full md:w-auto"></div>'+
+  el.innerHTML='<div class="controles-item"><label for="periodo-inicio">Mês de início:</label><input type="month" id="periodo-inicio" class="w-full md:w-auto"></div>'+
+    '<div class="controles-item"><label for="periodo-fim">Mês de término:</label><input type="month" id="periodo-fim" class="w-full md:w-auto"></div>'+
     '<div class="controles-item ml-auto"><button onclick="atualizarDadosPonto()" class="botao-primario w-full md:w-auto">Gerar Relatório</button></div>';
-  if(PONTO_INICIO&&PONTO_FIM){
-    document.getElementById('periodo-inicio').value=PONTO_INICIO;
-    document.getElementById('periodo-fim').value=PONTO_FIM;
-    atualizarDadosPonto();
-  }else if(PERIODOS.length>0){
-    document.getElementById('periodo-inicio').value=PERIODOS[0].inicio;
-    document.getElementById('periodo-fim').value=PERIODOS[0].fim;
-  }
+  const ok=v=>/^\d{4}-\d{2}$/.test(v||'');
+  document.getElementById('periodo-inicio').value=ok(PONTO_INICIO)?PONTO_INICIO:mesAtualYM();
+  document.getElementById('periodo-fim').value=ok(PONTO_FIM)?PONTO_FIM:mesAtualYM();
+  if(ok(PONTO_INICIO)&&ok(PONTO_FIM))atualizarDadosPonto();
 }
 function atualizarDadosPonto(){
   const main=document.getElementById('main-container');
   main.innerHTML='';
-  const di=document.getElementById('periodo-inicio').value,df=document.getElementById('periodo-fim').value;
-  localStorage.setItem(LS_KEYS.pontoInicio,di);localStorage.setItem(LS_KEYS.pontoFim,df);
-  if(!di||!df){main.innerHTML='<p class="p-4 text-center text-gray-500">Por favor, selecione a data de início e fim.</p>';return}
-  const periodo={inicio:di,fim:df,label:'Período: '+formatarDataBR(di)+' a '+formatarDataBR(df)};
-  PESSOAS.forEach(nome=>{main.appendChild(criarCartaoPessoa(nome,periodo))});
+  const mi=document.getElementById('periodo-inicio').value,mf=document.getElementById('periodo-fim').value;
+  if(!mi||!mf){main.innerHTML='<p class="p-4 text-center text-gray-500">Por favor, selecione o mês de início e o mês de término.</p>';return}
+  if(mf<mi){main.innerHTML='<p class="p-4 text-center text-gray-500">O mês de término não pode ser anterior ao mês de início.</p>';return}
+  localStorage.setItem(LS_KEYS.pontoInicio,mi);localStorage.setItem(LS_KEYS.pontoFim,mf);
+  PESSOAS.forEach(nome=>{main.appendChild(criarCartaoPessoa(nome,{mesIni:mi,mesFim:mf}))});
 }
 /* ===== FICHA DE PONTO (estagiário: dia 16 ao dia 15) ===== */
 function criarCartaoPessoa(nome,periodo){
   const info=DB_PESSOAS[nome]||{matricula:"N/A",vinculo:"Funcionário",secretaria:""};
   const isEst=ehEstagiarioInfo(info);
   const cols=isEst?7:9;
-  let iniP=periodo.inicio,fimP=periodo.fim,labelP=periodo.label;
-  if(isEst){
-    const gf=new Date(periodo.fim+"T00:00:00");
-    const gA=gf.getFullYear(),gM=gf.getMonth();
-    const ef=new Date(gA,gM,15),ei=new Date(gA,gM-1,16);
-    iniP=formatarDataISO(ei);fimP=formatarDataISO(ef);
-    labelP='Período: '+formatarDataBR(iniP)+' a '+formatarDataBR(fimP);
-  }
+  const pc=periodoDoContrato(info.vinculo,periodo.mesIni,periodo.mesFim);
+  const iniP=pc.inicio,fimP=pc.fim;
+  const labelP='Período: '+formatarDataBR(iniP)+' a '+formatarDataBR(fimP);
   const container=document.createElement('div');
   container.className='container-pessoa';
   container.dataset.tipo=isEst?'estagiario':'funcionario';
   container.dataset.periodoLabel=labelP;
+  container.dataset.nome=nome;
   let headersHTML='',colGroup='';
   for(let i=0;i<cols;i++){colGroup+=(i===1)?'<col style="width: 100px">':'<col style="width: 80px">'}
   if(isEst){
@@ -413,11 +438,11 @@ function criarCartaoPessoa(nome,periodo){
       '<tr><th></th><th></th><th>Entrada</th><th>Saída</th><th>Entrada</th><th>Saída</th><th>Entrada</th><th>Saída</th><th></th></tr>';
   }
   container.innerHTML='<h2 class="cabecalho-pessoa">'+nome+
-    '<span class="text-xs font-normal text-gray-500 float-right mt-1 bg-gray-100 px-2 py-1 rounded-sm border border-gray-200">'+info.vinculo+'</span></h2>'+
+    '<span class="text-xs font-normal text-gray-500 float-right mt-1 bg-gray-100 px-2 py-1 rounded-sm border border-gray-200">'+info.vinculo+(isEst&&info.nivel?' • Nível '+info.nivel:'')+'</span></h2>'+
     '<div class="info-container"><div class="info-pessoa">'+
     '<p><strong>Nome:</strong> '+nome+' <span class="ml-4"><strong>Matrícula:</strong> '+info.matricula+'</span></p>'+
     '<p><strong>Secretaria:</strong> '+info.secretaria+'</p>'+
-    '<p><strong>Função:</strong>  <span class="ml-4"><strong>Admissão:</strong> </span></p>'+
+    (isEst?'<p><strong>Função:</strong> '+(info.funcao||'')+' <span class="ml-4"><strong>Departamento:</strong> '+(info.departamento||'')+'</span></p>':'<p><strong>Função:</strong>  <span class="ml-4"><strong>Admissão:</strong> </span></p>')+
     '</div><div class="info-periodo"><p><strong>'+labelP+'</strong></p></div></div>'+
     '<div class="grid-container"><table class="grid-ponto" style="width: '+(cols*80+20)+'px; min-width: '+(cols*80+20)+'px;"><colgroup>'+colGroup+'</colgroup><thead>'+headersHTML+'</thead><tbody class="grid-body"></tbody></table></div>';
   const gridBody=container.querySelector('.grid-body');
@@ -451,7 +476,7 @@ function criarCartaoPessoa(nome,periodo){
   }else{
     gridBody.innerHTML+='<tr><td colspan="5" class="b-none"></td><td colspan="3" class="footer-totals text-center">Total de horas no período:</td><td class="footer-totals b-none">&nbsp;</td></tr>'+
       '<tr><td colspan="9" class="b-none">&nbsp;</td></tr>'+
-      '<tr><td colspan="2" class="footer-totals">Total de Dias Úteis/mês:</td><td class="footer-totals">&nbsp;</td><td colspan="2" class="footer-totals">N° Horas/Dia: 08</td><td class="b-none"></td><td colspan="3" class="footer-totals">Total de horas a trabalhar:</td></tr>'+
+      '<tr><td colspan="2" class="footer-totals">Total de Dias Úteis/mês:</td><td class="footer-totals">&nbsp;</td><td colspan="2" class="footer-totals">N° Horas/Dia: '+(fmtHoras(info.horasDia)||'08')+'</td><td class="b-none"></td><td colspan="3" class="footer-totals">Total de horas a trabalhar:</td></tr>'+
       '<tr><td colspan="9" class="b-none" style="height: 30px;">&nbsp;</td></tr>'+
       '<tr><td colspan="4" class="footer-signature-line">&nbsp;</td><td class="b-none"></td><td colspan="4" class="footer-signature-line">&nbsp;</td></tr>'+
       '<tr><td colspan="4" class="footer-signature">Funcionário</td><td class="b-none"></td><td colspan="4" class="footer-signature">Responsável</td></tr>';
@@ -502,8 +527,8 @@ function gerarLogoPrefeituraLocal(){
 async function exportarHTMLparaExcel(){
   const di=document.getElementById('periodo-inicio'),df=document.getElementById('periodo-fim');
   if(!di||!df||!di.value||!df.value){alert("Por favor, gere um relatório de ponto antes de exportar.");return}
-  const dataInicioISO=di.value,dataFimISO=df.value;
-  const nomeFile='Relatorio_Ponto_'+formatarDataBR(dataInicioISO).replace(/\//g,'-')+'_a_'+formatarDataBR(dataFimISO).replace(/\//g,'-')+'.xlsx';
+  if(!document.querySelectorAll('.container-pessoa').length){alert("Por favor, gere um relatório de ponto antes de exportar.");return}
+  const nomeFile='Relatorio_Ponto_'+formatarMesBR(di.value).replace(/\//g,'-')+'_a_'+formatarMesBR(df.value).replace(/\//g,'-')+'.xlsx';
   const meses=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
   const brasaoImg=await obterLogoPrefeitura();
   const workbook=new ExcelJS.Workbook();
@@ -513,7 +538,7 @@ async function exportarHTMLparaExcel(){
     const infoP=container.querySelectorAll('.info-pessoa p');
     const nomeText=infoP[0]?infoP[0].textContent:'';
     const secText=infoP[1]?infoP[1].textContent:'';
-    const nomeRaw=(nomeText.match(/Nome: (.*?) Matrícula:/)||[])[1]?.trim()||'';
+    const nomeRaw=container.dataset.nome||(nomeText.match(/Nome: (.*?) Matrícula:/)||[])[1]?.trim()||'';
     const matriculaRaw=(nomeText.match(/Matrícula: (.*)/)||[])[1]?.trim()||'';
     const secretariaRaw=secText.replace('Secretaria: ','').trim();
     const pessoaInfo=DB_PESSOAS[nomeRaw]||{};
@@ -544,15 +569,15 @@ async function exportarHTMLparaExcel(){
       const r9=sheet.getRow(9);const c9=r9.getCell(1);c9.value="Local: Divisão de Dívida Ativa";c9.style=infoStyle;sheet.mergeCells('A9:H9');
       sheet.getRow(10).values=[];
       const r11=sheet.getRow(11);const c11=r11.getCell(1);c11.value='Nome: '+nomeRaw;c11.style=infoStyle;sheet.mergeCells('A11:H11');
-      const r12=sheet.getRow(12);const c12=r12.getCell(1);c12.value="Nível: superior";c12.style=infoStyle;sheet.mergeCells('A12:H12');
+      const r12=sheet.getRow(12);const c12=r12.getCell(1);c12.value="Nível: "+(pessoaInfo.nivel||nivelEstagio(pessoaInfo.vinculo)||"Superior");c12.style=infoStyle;sheet.mergeCells('A12:H12');
       let textoPeriodo=periodoLabelRaw;
       try{
         const mt=periodoLabelRaw.match(/(\d{2})\/(\d{2})\/(\d{4}) a (\d{2})\/(\d{2})\/(\d{4})/);
-        if(mt){const m1=parseInt(mt[2],10)-1,m2=parseInt(mt[5],10)-1;textoPeriodo='Período: '+meses[m1]+'/'+meses[m2]+' de '+mt[6];}
+        if(mt){const m1=parseInt(mt[2],10)-1,m2=parseInt(mt[5],10)-1;textoPeriodo='Período: '+meses[m1]+(mt[3]!==mt[6]?' de '+mt[3]:'')+'/'+meses[m2]+' de '+mt[6];}
       }catch(e){}
       const r13=sheet.getRow(13);sheet.mergeCells('A13:G13');
       const c13=r13.getCell(1);c13.value=textoPeriodo;c13.style={font:{name:'Arial',bold:true,size:11}};
-      const c13h=r13.getCell(8);c13h.value="Carga horária: 06hs";c13h.style={font:{name:'Arial',size:10},alignment:{horizontal:'right'}};
+      const c13h=r13.getCell(8);c13h.value="Carga horária: "+(fmtHoras(pessoaInfo.horasDia)||"06")+"hs";c13h.style={font:{name:'Arial',size:10},alignment:{horizontal:'right'}};
       sheet.getRow(14).values=[];
       const hg={font:{name:'Arial',size:10,bold:true},fill:{type:'pattern',pattern:'solid',fgColor:{argb:'FFF2F2F2'}},border:{top:{style:'thin'},left:{style:'thin'},bottom:{style:'thin'},right:{style:'thin'}},alignment:{horizontal:'center',vertical:'middle'}};
       const r15=sheet.getRow(15),r16=sheet.getRow(16);
@@ -604,7 +629,7 @@ async function exportarHTMLparaExcel(){
           sheet.mergeCells(rowObj.number,1,rowObj.number,2);rowObj.getCell(1).value="Total de Dias Úteis/mês:";
           for(let k=1;k<=2;k++)rowObj.getCell(k).style=bs;
           rowObj.getCell(3).style=bs;
-          sheet.mergeCells(rowObj.number,4,rowObj.number,5);rowObj.getCell(4).value="N° Horas/Dia: 08";
+          sheet.mergeCells(rowObj.number,4,rowObj.number,5);rowObj.getCell(4).value="N° Horas/Dia: "+(fmtHoras(pessoaInfo.horasDia)||"08");
           for(let k=4;k<=5;k++)rowObj.getCell(k).style=bs;
           sheet.mergeCells(rowObj.number,6,rowObj.number,7);rowObj.getCell(6).value="Total de horas a trabalhar:";
           for(let k=6;k<=7;k++)rowObj.getCell(k).style=bs;
@@ -654,8 +679,8 @@ async function exportarHTMLparaExcel(){
       const rS=sheet.getRow(9);rS.values=['Secretaria: '+secretariaRaw];sheet.mergeCells(9,1,9,totalCols);
       rS.getCell(1).style=infoStyle;for(let k=1;k<=totalCols;k++)rS.getCell(k).style=infoStyle;
       const rF=sheet.getRow(10);
-      const cF=rF.getCell(1);cF.value='Função: ';cF.style=infoStyle;
-      const cA=rF.getCell(half+1);cA.value='Admissão: ';cA.style=infoStyle;
+      const cF=rF.getCell(1);cF.value=isEst?'Função: '+(pessoaInfo.funcao||''):'Função: ';cF.style=infoStyle;
+      const cA=rF.getCell(half+1);cA.value=isEst?'Departamento: '+(pessoaInfo.departamento||''):'Admissão: ';cA.style=infoStyle;
       sheet.mergeCells(10,1,10,half);sheet.mergeCells(10,half+1,10,totalCols);
       for(let k=1;k<=totalCols;k++)rF.getCell(k).style=infoStyle;
       sheet.getRow(11).values=[];
@@ -703,7 +728,7 @@ async function exportarHTMLparaExcel(){
           sheet.mergeCells(rowObj.number,1,rowObj.number,2);rowObj.getCell(1).value="Total de Dias Úteis/mês:";
           for(let k=1;k<=2;k++)rowObj.getCell(k).style=bs;
           rowObj.getCell(3).style=bs;
-          sheet.mergeCells(rowObj.number,4,rowObj.number,5);rowObj.getCell(4).value="N° Horas/Dia: 08";
+          sheet.mergeCells(rowObj.number,4,rowObj.number,5);rowObj.getCell(4).value="N° Horas/Dia: "+(fmtHoras(pessoaInfo.horasDia)||"08");
           for(let k=4;k<=5;k++)rowObj.getCell(k).style=bs;
           sheet.mergeCells(rowObj.number,6,rowObj.number,8);rowObj.getCell(6).value="Total de horas a trabalhar:";
           for(let k=6;k<=8;k++)rowObj.getCell(k).style=bs;
@@ -753,12 +778,13 @@ function gerarPDF(){window.print();salvarHistorico('Ponto_'+new Date().toISOStri
 function gerarRelatorioTXT(){
   const ini=document.getElementById('periodo-inicio').value,fim=document.getElementById('periodo-fim').value;
   let txt='RELATÓRIO DE PONTO - PREFEITURA MUNICIPAL DE LIMEIRA\n';
-  txt+='Período: '+(ini?formatarDataBR(ini):'-')+' a '+(fim?formatarDataBR(fim):'-')+'\n';
+  txt+='Meses: '+(ini?formatarMesBR(ini):'-')+' a '+(fim?formatarMesBR(fim):'-')+'\n';
   txt+='Gerado em: '+new Date().toLocaleString('pt-BR')+'\n'+'='.repeat(70)+'\n\n';
   PESSOAS.forEach(nome=>{
     const info=DB_PESSOAS[nome]||{matricula:'-',vinculo:'Funcionário'};
     txt+='FUNCIONÁRIO: '+nome.toUpperCase()+' ('+info.vinculo+')\n';
-    txt+='Matrícula: '+(info.matricula||'-')+' • Secretaria: '+(info.secretaria||'-')+'\n';
+    txt+='Matrícula: '+(info.matricula||'-')+' • Cargo: '+(info.cargo||'-')+' • Departamento: '+(info.departamento||'-')+' • Secretaria: '+(info.secretaria||'-')+'\n';
+    if(ini&&fim){const pc=periodoDoContrato(info.vinculo,ini,fim);txt+='Período: '+formatarDataBR(pc.inicio)+' a '+formatarDataBR(pc.fim)+(ehEstagiarioInfo(info)&&info.nivel?' • Nível: '+info.nivel:'')+(info.horasDia?' • Horas/dia: '+fmtHoras(info.horasDia):'')+'\n';}
     txt+='-'.repeat(70)+'\n';
   });
   const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
@@ -821,3 +847,5 @@ window.addEventListener('focus',carregarDados);
 </script>
 </body>
 </html>
+
+
