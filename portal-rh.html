@@ -56,7 +56,6 @@ a{text-decoration:none;color:inherit}
 #view-ponto.active,#view-ferias.active,#view-histferias.active{display:flex;flex-direction:column;height:100%;overflow:hidden}
 #view-ponto .page-head,#view-ferias .page-head,#view-histferias .page-head{flex-shrink:0}
 #view-ponto .panel,#view-ferias .panel,#view-histferias .panel{flex:1;min-height:0;display:flex;flex-direction:column;margin-bottom:0}
-/* PONTO (funcionários no eixo Y, horários no eixo X) */
 .ponto-layout{flex:1;min-height:0;display:flex;gap:12px;align-items:stretch}
 .ponto-main{flex:1;min-width:0;display:flex;flex-direction:column}
 .ponto-filtro{width:220px;flex-shrink:0;background:var(--branco);border:1px solid #e3eaf2;border-radius:var(--raio);padding:12px;box-shadow:var(--sombra);overflow-y:auto}
@@ -78,7 +77,6 @@ a{text-decoration:none;color:inherit}
 .tlP-bar{position:absolute;top:12%;height:76%;background:#2f9e6e;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.25);overflow:hidden;white-space:nowrap;z-index:2;padding:0 8px}
 .tlP-bar:hover{filter:brightness(1.1)}
 .tlP-bar .tbP-av{width:24px;height:24px;border-radius:50%;background:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:4px}
-/* FÉRIAS */
 .fc{width:100%;height:100%;display:flex;flex-direction:column;overflow:auto}
 .fc-head{display:flex;align-items:stretch;flex-shrink:0;border-bottom:1px solid var(--azul-suave);background:var(--azul-claro)}
 .fc-label{width:70px;flex-shrink:0;background:var(--azul-escuro);color:#fff;font-size:8.5px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:2px;overflow:hidden}
@@ -98,7 +96,6 @@ a{text-decoration:none;color:inherit}
 .fc-bar:hover{filter:brightness(1.12)}
 .fc-avatar{width:15px;height:15px;border-radius:50%;background:#fff;font-size:6.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:3px;color:#3a464f}
 #gantt-ferias{flex:1;min-height:0;overflow:hidden}
-/* HISTÓRICO DE FÉRIAS */
 .hfc{width:100%;height:100%;display:flex;flex-direction:column;gap:6px;overflow:auto}
 .hfc-head{display:flex;align-items:stretch;flex-shrink:0}
 .hfc-label{width:140px;flex-shrink:0;display:flex;align-items:center;gap:6px;padding:4px 6px;background:var(--azul-claro);border:1px solid var(--azul-suave);border-radius:8px;font-size:9.5px;font-weight:700;color:var(--azul-escuro);overflow:hidden;white-space:nowrap}
@@ -113,7 +110,6 @@ a{text-decoration:none;color:inherit}
 .ferias-nav .nav-btn{background:var(--azul-claro);border:1px solid var(--azul-suave);color:var(--azul);border-radius:7px;width:28px;height:28px;font-size:13px;cursor:pointer;font-weight:700;line-height:1}
 .ferias-nav .nav-btn:hover{background:var(--azul);color:#fff}
 .ferias-nav .nav-label{font-size:12px;font-weight:700;color:var(--azul-escuro);min-width:180px;text-align:center}
-/* ESCALA */
 .esc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
 .esc-card{background:var(--branco);border:1px solid #e3eaf2;border-radius:var(--raio);padding:11px;box-shadow:var(--sombra);cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;border-left:4px solid var(--azul)}
 .esc-card:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,85,164,.15);border-color:var(--azul)}
@@ -142,7 +138,6 @@ tbody tr:hover{background:var(--azul-claro)}
 .badge.fixo{background:var(--azul-claro);color:var(--azul)}.badge.suplente{background:var(--laranja-claro);color:var(--laranja)}
 .badge.ok{background:var(--verde-claro);color:var(--verde)}.badge.warn{background:var(--laranja-claro);color:var(--laranja)}.badge.tipo{background:#eef2f8;color:var(--texto-suave)}
 .badge.senha{background:var(--azul-claro);color:var(--azul)}.badge.guiche{background:var(--laranja-claro);color:var(--laranja)}
-/* DROPDOWN */
 .dd{position:relative;display:inline-block}
 .dd-btn{display:inline-flex;align-items:center;gap:6px;background:var(--azul-escuro);color:#fff;border:none;border-radius:7px;padding:7px 12px;font-size:11.5px;font-weight:600;cursor:pointer}
 .dd-btn:hover{background:#002c58}
@@ -154,7 +149,6 @@ tbody tr:hover{background:var(--azul-claro)}
 .dd-div{margin:4px 0;border-top:1px solid #eef2f8}
 #lote-bar{display:none;align-items:center;gap:10px;background:var(--laranja-claro);border:1px solid #f2dfc3;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:11.5px;font-weight:600;color:var(--laranja)}
 #lote-bar.show{display:flex}
-/* PERFIL */
 .perfil-overlay{position:fixed;inset:0;z-index:200;background:var(--cinza);display:none;flex-direction:column}
 .perfil-overlay.open{display:flex;animation:fadeIn .25s ease}
 .perfil-top{height:48px;flex-shrink:0;background:var(--azul-escuro);color:#fff;display:flex;align-items:center;gap:12px;padding:0 16px}
@@ -224,6 +218,10 @@ tbody tr:hover{background:var(--azul-claro)}
 .empty .e-ico{font-size:28px;display:block;margin-bottom:6px;opacity:.5}
 .campos-ponto{background:var(--cinza);border:1px solid #e3eaf2;border-radius:9px;padding:10px 12px;margin-bottom:11px}
 .campos-ponto .cp-title{font-size:10px;font-weight:700;color:var(--azul-escuro);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+.cor-picker{display:flex;gap:6px;flex-wrap:wrap}
+.cor-picker .cor-opt{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .12s}
+.cor-picker .cor-opt:hover{transform:scale(1.15)}
+.cor-picker .cor-opt.sel{border-color:var(--texto);box-shadow:0 0 0 3px var(--azul-suave)}
 @media(max-width:1020px){.pf-cards{grid-template-columns:1fr}.main{padding:10px 10px 18px}.sidebar{width:190px}}
 @media(max-width:900px){.sidebar{transform:translateX(-100%);position:fixed;z-index:55;background:var(--branco);box-shadow:0 0 40px rgba(0,0,0,.2)}.sidebar.open{transform:translateX(0)}.ponto-layout{flex-direction:column;height:auto}.ponto-filtro{width:100%}.perfil-left{width:100%;max-height:40vh;border-right:none;border-bottom:1px solid #e3eaf2}.perfil-body{flex-direction:column}}
 @media(max-width:720px){.panel{padding:9px}.page-head h1{font-size:14px}.func-card{min-height:44px}.func-avatar{width:34px;height:34px;font-size:12px}}
@@ -243,10 +241,7 @@ tbody tr:hover{background:var(--azul-claro)}
 <div class="mod-item active" data-view="home" onclick="go('home')"><div class="mi-ico" style="background:#0055a4">🏠</div><div class="mi-label">Visão Geral</div></div>
 <div class="mod-item" data-view="funcionarios" onclick="go('funcionarios')"><div class="mi-ico" style="background:#1e6fd9">👥</div><div class="mi-label">Funcionários</div></div>
 <div class="mod-item" data-view="ponto" onclick="go('ponto')"><div class="mi-ico" style="background:#2f9e6e">🕐</div><div class="mi-label">Ponto</div></div>
-<div class="mod-item" data-view="pontos" onclick="go('pontos')"><div class="mi-ico" style="background:#3aa0c9">💾</div><div class="mi-label">Pontos Salvos</div></div>
 <div class="mod-item" data-view="escala" onclick="go('escala')"><div class="mi-ico" style="background:#7a5cc4">📅</div><div class="mi-label">Escala</div></div>
-<div class="mod-item" data-view="escalas" onclick="go('escalas')"><div class="mi-ico" style="background:#d98a2b">🗂️</div><div class="mi-label">Escalas Salvas</div></div>
-<div class="mod-item" data-view="histescala" onclick="go('histescala')"><div class="mi-ico" style="background:#b7791f">📊</div><div class="mi-label">Hist. Escala</div></div>
 <div class="mod-item" data-view="ferias" onclick="go('ferias')"><div class="mi-ico" style="background:#e05a6a">🏖️</div><div class="mi-label">Férias</div></div>
 <div class="mod-item" data-view="histferias" onclick="go('histferias')"><div class="mi-ico" style="background:#c94f3a">📋</div><div class="mi-label">Hist. Férias</div></div>
 <div class="mod-item" data-view="feriados" onclick="go('feriados')"><div class="mi-ico" style="background:#1e9e8e">🎉</div><div class="mi-label">Feriados</div></div>
@@ -280,32 +275,21 @@ tbody tr:hover{background:var(--azul-claro)}
 <button class="dd-danger" onclick="apagarEmLote()">🗑️ Apagar em lote</button>
 </div></div></div></div>
 <div id="lote-bar"><span id="lote-info">0 selecionado(s)</span><button class="btn btn-small btn-danger" onclick="excluirLoteSelecionados()">🗑️ Excluir selecionados</button><button class="btn btn-small btn-ghost" onclick="cancelarLote()">Cancelar</button></div>
-<div class="panel"><div class="table-wrap"><table><thead><tr id="tbl-func-head"><th>Nome Completo</th><th>Matrícula</th><th>Cargo</th><th>Departamento</th><th>Secretaria</th><th>Contrato</th><th>Ações</th></tr></thead><tbody id="tbl-funcionarios"></tbody></table></div></div>
+<div class="panel"><div class="table-wrap"><table><thead><tr id="tbl-func-head"><th>Nome Completo</th><th>Matrícula</th><th>Cargo</th><th>Departamento</th><th>Secretaria</th><th>Contrato</th><th>Cor</th><th>Ações</th></tr></thead><tbody id="tbl-funcionarios"></tbody></table></div>
 </section>
 <section class="view" id="view-ponto">
-<div class="page-head"><div><h1>Ponto</h1><p>Funcionários no eixo vertical e horários (06:00 - 18:00) no eixo horizontal</p></div><button class="btn" onclick="novoPonto()">➕ Incluir</button></div>
+<div class="page-head"><div><h1>Ponto</h1><p>Funcionários no eixo vertical e horários (06:00 - 18:00) no eixo horizontal</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-orange" onclick="abrirPontoDias()">🗓️ Dias de Ponto por Contrato</button><button class="btn" onclick="novoPonto()">➕ Incluir</button></div></div>
 <div class="ponto-layout"><div class="ponto-main"><div id="gantt-ponto"></div></div>
 <div class="ponto-filtro"><h3>Filtros</h3>
 <div class="field"><label>Funcionário</label><input id="ponto-busca" placeholder="Buscar por nome..." oninput="renderPonto()"></div>
 <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="renderPonto()">🔄 Atualizar</button>
-<div style="margin-top:14px;font-size:11px;color:var(--texto-suave)">Cada barra horizontal é o expediente único do funcionário, do primeiro ao último horário cadastrado.</div></div></div>
-</section>
-<section class="view" id="view-pontos">
-<div class="page-head"><div><h1>Pontos Salvos</h1><p>Expedientes cadastrados (um por funcionário): visualizar, editar ou excluir</p></div><button class="btn" onclick="novoPonto()">➕ Incluir</button></div>
-<div class="stat-grid" id="stats-pontos"></div>
-<div class="panel"><div class="table-wrap"><table><thead><tr><th>Funcionário</th><th>Contrato</th><th>Horários</th><th>Ações</th></tr></thead><tbody id="tbl-pontos"></tbody></table></div></div>
+<div style="margin-top:14px;font-size:11px;color:var(--texto-suave)">Cada barra horizontal é o expediente único do funcionário. Clique na barra para abrir o ponto daquele funcionário.</div>
+<div style="margin-top:10px;font-size:10px;color:var(--texto-suave)"><b>Regras de competência (qualquer mês/ano):</b><br>• Efetivo: dia 11 → dia 10 (mês seguinte)<br>• Estag. Ens. Superior: dia 16 → dia 15<br>• Estag. Ens. Médio: dia 26 → dia 25</div>
+</div></div>
 </section>
 <section class="view" id="view-escala">
 <div class="page-head"><div><h1>Escala</h1><p>Clique no card para definir senha, guichê, fixo no guichê e apelido para a escala</p></div><button class="btn" onclick="novaEscala()">➕ Incluir</button></div>
 <div class="esc-grid" id="esc-grid"></div>
-</section>
-<section class="view" id="view-escalas">
-<div class="page-head"><div><h1>Escalas Salvas</h1><p>Escalas de trabalho consolidadas</p></div></div>
-<div class="panel"><div class="table-wrap"><table><thead><tr><th>Funcionário</th><th>Apelido</th><th>Local</th><th>Fixo no guichê</th><th>Ações</th></tr></thead><tbody id="tbl-escalas"></tbody></table></div></div>
-</section>
-<section class="view" id="view-histescala">
-<div class="page-head"><div><h1>Histórico de Escala</h1><p>Quantidade de vezes como fixo, suplente e dias no guichê</p></div></div>
-<div class="panel"><div class="table-wrap"><table><thead><tr><th>Funcionário</th><th>Vezes Fixo</th><th>Vezes Suplente</th><th>Dias no Guichê</th><th>Última alteração</th></tr></thead><tbody id="tbl-histescala"></tbody></table></div></div>
 </section>
 <section class="view" id="view-ferias">
 <div class="page-head"><div><h1>Férias</h1><p>Linha do tempo contínua em semanas: datas em sequência real, com o mês indicado na coluna esquerda</p></div>
@@ -317,8 +301,8 @@ tbody tr:hover{background:var(--azul-claro)}
 <div class="panel"><div class="panel-head"><h3>Linha do tempo por funcionário</h3><span class="sub">Clique na barra para editar/excluir</span></div><div id="gantt-histferias"></div></div>
 </section>
 <section class="view" id="view-feriados">
-<div class="page-head"><div><h1>Feriados</h1><p>Feriados municipais e nacionais</p></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><select id="ano-base" style="padding:6px 10px;border:1px solid #d3e2f5;border-radius:7px;font-size:11.5px" onchange="renderFeriados()"></select><button class="btn" onclick="novaFeriado()">➕ Incluir</button></div></div>
-<div class="panel"><div class="table-wrap"><table><thead><tr><th>Data</th><th>Nome</th><th>Tipo</th><th>Ações</th></tr></thead><tbody id="tbl-feriados"></tbody></table></div></div>
+<div class="page-head"><div><h1>Feriados</h1><p>Cadastro mestre — nacionais, municipais de Limeira e facultativos, em TODOS os anos (1900 a 2100)</p></div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><input id="feri-busca" placeholder="🔍 Buscar feriado..." style="padding:6px 10px;border:1px solid #d3e2f5;border-radius:7px;font-size:11.5px" oninput="renderFeriados()"><select id="tipo-filtro" style="padding:6px 10px;border:1px solid #d3e2f5;border-radius:7px;font-size:11.5px" onchange="renderFeriados()"><option value="">Todos os tipos</option><option>Nacional</option><option>Municipal</option><option>Estadual</option><option>Facultativo</option></select><select id="ano-base" style="padding:6px 10px;border:1px solid #d3e2f5;border-radius:7px;font-size:11.5px" onchange="renderFeriados()"></select><button class="btn" onclick="novaFeriado()">➕ Incluir</button></div></div>
+<div class="panel"><div class="table-wrap"><table><thead><tr><th>Data</th><th>Nome</th><th>Tipo</th><th>Ações</th></tr></thead><tbody id="tbl-feriados"></tbody></table></div>
 </section>
 </main>
 </div>
@@ -349,6 +333,7 @@ tbody tr:hover{background:var(--azul-claro)}
 <div class="field"><label>Departamento</label><div style="display:flex;gap:6px"><select id="fu-departamento" style="flex:1"></select><button class="btn btn-ghost btn-small" onclick="abrirDepCadastro()" title="Criar departamento">➕</button></div></div>
 <div class="field"><label>Secretaria</label><div style="display:flex;gap:6px"><select id="fu-secretaria" style="flex:1"></select><button class="btn btn-ghost btn-small" onclick="abrirSecretariaCadastro()" title="Criar secretaria">➕</button></div></div>
 <div class="field"><label>Tipo de Contrato</label><div style="display:flex;gap:6px"><select id="fu-contrato" style="flex:1" onchange="atualizarDicaMatricula()"></select><button class="btn btn-ghost btn-small" onclick="abrirContratoCadastro()" title="Criar tipo de contrato">➕</button></div></div>
+<div class="field"><label>Cor do funcionário</label><div class="cor-picker" id="fu-cor-picker"></div><div class="field-hint">Escolha a cor usada nos cards, timeline de ponto e escalas. Deixe "Automática" para o sistema escolher.</div></div>
 </div>
 <div class="modal-foot"><button class="btn btn-danger" id="fu-excluir-btn" style="display:none;margin-right:auto" onclick="abrirExcluirFuncionario(funcEditando)">🗑️ Excluir</button><button class="btn btn-ghost" onclick="fecharModal('modal-funcionario')">Cancelar</button><button class="btn" onclick="salvarFuncionario()">Salvar</button></div>
 </div>
@@ -379,7 +364,7 @@ tbody tr:hover{background:var(--azul-claro)}
 <div class="modal-overlay" id="modal-feriado">
 <div class="modal">
 <div class="modal-head"><h3 id="feri-titulo">Cadastrar Feriado</h3><button class="modal-close" onclick="fecharModal('modal-feriado')">×</button></div>
-<div class="modal-body"><div class="field"><label>Nome do Feriado</label><input id="feri-nome" placeholder="Nome do feriado"></div><div class="field"><label>Data</label><input type="date" id="feri-data"></div><div class="field"><label>Tipo</label><select id="feri-tipo"><option value="Nacional">Nacional</option><option value="Municipal">Municipal</option><option value="Estadual">Estadual</option><option value="Facultativo">Facultativo</option></select></div></div>
+<div class="modal-body"><div class="field"><label>Nome do Feriado</label><input id="feri-nome" placeholder="Nome do feriado"></div><div class="field"><label>Data</label><input type="date" id="feri-data"></div><div class="field"><label>Tipo</label><select id="feri-tipo"><option value="Nacional">Nacional</option><option value="Municipal">Municipal (Limeira)</option><option value="Estadual">Estadual</option><option value="Facultativo">Facultativo</option></select></div></div>
 <div class="modal-foot"><button class="btn btn-danger" id="feri-excluir-btn" style="display:none;margin-right:auto" onclick="abrirExcluirFeriado(feriadoEditando)">🗑️ Excluir</button><button class="btn btn-ghost" onclick="fecharModal('modal-feriado')">Cancelar</button><button class="btn" onclick="salvarFeriado()">Salvar</button></div>
 </div>
 </div>
@@ -402,9 +387,12 @@ tbody tr:hover{background:var(--azul-claro)}
 const firebaseConfig = {apiKey:"AIzaSyBQ7_k7huhS8oAyKp0OsbEajXFmrNxcrlo",authDomain:"kyro-7cb7a.firebaseapp.com",databaseURL:"https://kyro-7cb7a-default-rtdb.firebaseio.com",projectId:"kyro-7cb7a",storageBucket:"kyro-7cb7a.firebasestorage.app",messagingSenderId:"368737182812",appId:"1:368737182812:web:7be81b22a1a1fec5c97299",measurementId:"G-1XKDHWVEVE"};
 firebase.initializeApp(firebaseConfig);
 const db=firebase.database();
-const KEYS={funcionarios:'kyro_funcionarios',cargos:'kyro_cargos',departamentos:'kyro_departamentos',secretarias:'kyro_secretarias',pontos:'kyro_pontos_salvos',escalas:'kyro_escalas_salvas',escala_hist:'kyro_escala_hist',ferias:'kyro_ferias',feriados:'kyro_feriados',atestados:'kyro_atestados',contratos:'kyro_contratos',quantidades:'kyro_quantidades'};
-const _cache={};let _loaded=0;const _total=Object.keys(KEYS).length;
-Object.keys(KEYS).forEach(k=>{db.ref(KEYS[k]).on('value',snap=>{_cache[k]=snap.val()||[];_loaded++;if(_loaded>=_total&&typeof renderTudo==='function'){try{renderTudo()}catch(e){}}})});
+const KEYS={funcionarios:'kyro_funcionarios',cargos:'kyro_cargos',departamentos:'kyro_departamentos',secretarias:'kyro_secretarias',pontos:'kyro_pontos_salvos',escalas:'kyro_escalas_salvas',escala_hist:'kyro_escala_hist',ferias:'kyro_ferias',feriados:'kyro_feriados',atestados:'kyro_atestados',contratos:'kyro_contratos',quantidades:'kyro_quantidades',contratos_ponto:'kyro_contratos_ponto'};
+const _cache={};let _loaded=0;const _total=Object.keys(KEYS).length;let _feriadosSeedFeito=false;
+Object.keys(KEYS).forEach(k=>{db.ref(KEYS[k]).on('value',snap=>{
+  if(k==='feriados'&&!snap.exists()&&!_feriadosSeedFeito){_feriadosSeedFeito=true;const seed=gerarFeriadosPadrao();db.ref(KEYS[k]).set(seed);_cache[k]=seed;_loaded++;if(_loaded>=_total&&typeof renderTudo==='function'){try{renderTudo()}catch(e){}}return}
+  _cache[k]=snap.val()||[];_loaded++;if(_loaded>=_total&&typeof renderTudo==='function'){try{renderTudo()}catch(e){}}
+})});
 function load(k){return _cache[k]||[]}
 function save(k,d){_cache[k]=d;db.ref(KEYS[k]).set(d)}
 const CONTRATOS_PADRAO=['Efetivo','Estagiário','Comissionado','Terceirizado','Emergencial'];
@@ -413,6 +401,7 @@ const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agos
 const MESES_CURTOS=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 const DOWL=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const CORES=['#0055a4','#1e6fd9','#2f9e6e','#d9822b','#7a5cc4','#d64545','#1e9e8e','#b7791f','#3aa0c9','#c94f3a','#5c6b7d','#e05a6a'];
+const CORES_PICKER=CORES.concat(['#0e7490','#65a30d','#9333ea','#dc2626','#0891b2','#a16207','#be185d','#4d7c0f','#6d28d9','#0f766e']);
 const HORA_INI=6,HORA_FIM=18;
 const LAB4=['Entrada','Saída Almoço','Entrada Almoço','Saída'];
 const LAB6=['Entrada 1','Saída 1','Entrada 2','Saída 2','Entrada 3','Saída 3'];
@@ -423,8 +412,9 @@ function fmtData(iso){if(!iso)return '-';const p=iso.split('-');return p[2]+'/'+
 function isoDe(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function timeToMin(t){if(!t)return 0;const p=t.split(':');return (+p[0])*60+(+p[1]||0)}
 function horasDoPonto(h){let tot=0;for(let i=0;i+1<h.length;i+=2){tot+=Math.max(0,timeToMin(h[i+1])-timeToMin(h[i]))}return Math.round(tot/60*100)/100}
-function iniciais(nome){return nome.split(' ').filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('')||'?'}
-function corFuncionario(nome){let h=0;for(let i=0;i<nome.length;i++)h=(h*31+nome.charCodeAt(i))>>>0;return CORES[h%CORES.length]}
+function iniciais(nome){return String(nome||'').split(' ').filter(Boolean).slice(0,2).map(p=>p[0].toUpperCase()).join('')||'?'}
+function corFuncionario(nome){let h=0;for(let i=0;i<String(nome).length;i++)h=(h*31+nome.charCodeAt(i))>>>0;return CORES[h%CORES.length]}
+function corDe(f){if(f&&(f.cor||f.funcCor))return f.cor||f.funcCor;return corFuncionario((f&&(f.nome||f))||'')}
 function getFuncionarios(){let d=load('funcionarios');let muda=false;d.forEach((f,i)=>{if(!f.id){f.id='f'+Date.now()+'_'+i+'_'+Math.floor(Math.random()*99999);muda=true}});if(muda)save('funcionarios',d);return d}
 function getFuncById(id){return getFuncionarios().find(f=>String(f.id)===String(id))}
 function getPontoDe(fid){return load('pontos').find(p=>p&&String(p.funcId)===String(fid))}
@@ -445,13 +435,17 @@ function setSaudacao(){const h=new Date().getHours();const el=document.getElemen
 setSaudacao();
 let calAno,calMes;
 function calMudar(dir){calMes+=dir;if(calMes<0){calMes=11;calAno--}if(calMes>11){calMes=0;calAno++}renderCalendario()}
-function renderCalendario(){document.getElementById('cal-title').textContent=MESES[calMes]+' '+calAno;const primeiro=new Date(calAno,calMes,1),ini=(primeiro.getDay()+6)%7,dias=new Date(calAno,calMes+1,0).getDate(),hoje=new Date();const ev=new Set();load('feriados').forEach(f=>ev.add(f.data));load('ferias').forEach(f=>{if(f.inicio)ev.add(f.inicio);if(f.fim)ev.add(f.fim)});let h='<div class="dow">S</div><div class="dow">T</div><div class="dow">Q</div><div class="dow">Q</div><div class="dow">S</div><div class="dow">S</div><div class="dow">D</div>';for(let i=0;i<ini;i++)h+='<div class="day other"></div>';for(let d=1;d<=dias;d++){const data=calAno+'-'+String(calMes+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');const isHoje=hoje.getFullYear()===calAno&&hoje.getMonth()===calMes&&hoje.getDate()===d;const isE=ev.has(data);h+='<div class="day '+(isHoje?'today':isE?'event':'')+'">'+d+'</div>'}document.getElementById('cal-grid').innerHTML=h}
+function renderCalendario(){document.getElementById('cal-title').textContent=MESES[calMes]+' '+calAno;const primeiro=new Date(calAno,calMes,1),ini=(primeiro.getDay()+6)%7,dias=new Date(calAno,calMes+1,0).getDate(),hoje=new Date();const ev=new Set();load('feriados').forEach(f=>{if(f&&f.data&&String(f.data).slice(0,4)==String(calAno))ev.add(f.data)});load('ferias').forEach(f=>{if(f.inicio)ev.add(f.inicio);if(f.fim)ev.add(f.fim)});let h='<div class="dow">S</div><div class="dow">T</div><div class="dow">Q</div><div class="dow">Q</div><div class="dow">S</div><div class="dow">S</div><div class="dow">D</div>';for(let i=0;i<ini;i++)h+='<div class="day other"></div>';for(let d=1;d<=dias;d++){const data=calAno+'-'+String(calMes+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');const isHoje=hoje.getFullYear()===calAno&&hoje.getMonth()===calMes&&hoje.getDate()===d;const isE=ev.has(data);h+='<div class="day '+(isHoje?'today':isE?'event':'')+'">'+d+'</div>'}document.getElementById('cal-grid').innerHTML=h}
 (function(){const a=new Date();calAno=a.getFullYear();calMes=a.getMonth();renderCalendario()})();
 function popularQtdSelect(id){const sel=document.getElementById(id);if(!sel)return;let qs=load('quantidades');if(!qs.length)qs=QTD_PADRAO.slice();const old=sel.value;sel.innerHTML=qs.map(q=>'<option value="'+q+'">'+q+' horários</option>').join('');if(old&&[...sel.options].some(o=>o.value===old))sel.value=old;return sel}
-function preencherSelects(){const funcs=getFuncionarios();const cargos=load('cargos'),deps=load('departamentos'),secs=load('secretarias');const fc=document.getElementById('fu-cargo');if(fc)fc.innerHTML='<option value="">'+(cargos.length?'Selecione o cargo':'Nenhum cargo criado')+'</option>'+cargos.map(c=>'<option>'+c+'</option>').join('');const fd=document.getElementById('fu-departamento');if(fd)fd.innerHTML='<option value="">'+(deps.length?'Selecione o departamento':'Nenhum departamento criado')+'</option>'+deps.map(d=>'<option>'+d+'</option>').join('');const fs=document.getElementById('fu-secretaria');if(fs)fs.innerHTML='<option value="">'+(secs.length?'Selecione a secretaria':'Nenhuma secretaria criada')+'</option>'+secs.map(s=>'<option>'+s+'</option>').join('');const pf=document.getElementById('pt-func');if(pf)pf.innerHTML=funcs.map(p=>'<option value="'+p.id+'">'+p.nome+'</option>').join('')||'<option value="">Nenhum funcionário cadastrado</option>';const ef=document.getElementById('esc-func');if(ef)ef.innerHTML=funcs.map(p=>'<option value="'+p.id+'">'+p.nome+'</option>').join('')||'<option value="">Nenhum funcionário cadastrado</option>';const ff=document.getElementById('fer-func');if(ff)ff.innerHTML=funcs.map(p=>'<option value="'+p.id+'">'+p.nome+'</option>').join('')||'<option value="">Nenhum funcionário cadastrado</option>';const ct=document.getElementById('fu-contrato');if(ct){let cts=load('contratos');if(!cts.length)cts=CONTRATOS_PADRAO.slice();const oldC=ct.value;ct.innerHTML=cts.map(c=>'<option>'+c+'</option>').join('');if(oldC&&[...ct.options].some(o=>o.value===oldC))ct.value=oldC}popularQtdSelect('pt-qtd')}
-/* ===== MATRÍCULA: obrigatória exceto Estagiário ===== */
+function preencherSelects(){const funcs=getFuncionarios();const cargos=load('cargos'),deps=load('departamentos'),secs=load('secretarias');const fc=document.getElementById('fu-cargo');if(fc)fc.innerHTML='<option value="">'+(cargos.length?'Selecione o cargo':'Nenhum cargo criado')+'</option>'+cargos.map(c=>'<option>'+c+'</option>').join('');const fd=document.getElementById('fu-departamento');if(fd)fd.innerHTML='<option value="">'+(deps.length?'Selecione o departamento':'Nenhum departamento criado')+'</option>'+deps.map(d=>'<option>'+d+'</option>').join('');const fs=document.getElementById('fu-secretaria');if(fs)fs.innerHTML='<option value="">'+(secs.length?'Selecione a secretaria':'Nenhuma secretaria criada')+'</option>'+secs.map(s=>'<option>'+s+'</option>').join('');const pf=document.getElementById('pt-func');if(pf){const oldF=pf.value;pf.innerHTML=funcs.map(p=>'<option value="'+p.id+'">'+p.nome+'</option>').join('')||'<option value="">Nenhum funcionário cadastrado</option>';if(oldF&&[...pf.options].some(o=>o.value===oldF))pf.value=oldF}const ef=document.getElementById('esc-func');if(ef)ef.innerHTML=funcs.map(p=>'<option value="'+p.id+'">'+p.nome+'</option>').join('')||'<option value="">Nenhum funcionário cadastrado</option>';const ff=document.getElementById('fer-func');if(ff)ff.innerHTML=funcs.map(p=>'<option value="'+p.id+'">'+p.nome+'</option>').join('')||'<option value="">Nenhum funcionário cadastrado</option>';const ct=document.getElementById('fu-contrato');if(ct){let cts=load('contratos');if(!cts.length)cts=CONTRATOS_PADRAO.slice();const oldC=ct.value;ct.innerHTML=cts.map(c=>'<option>'+c+'</option>').join('');if(oldC&&[...ct.options].some(o=>o.value===oldC))ct.value=oldC}popularQtdSelect('pt-qtd')}
 function ehEstagiarioContrato(ct){return String(ct||'').toLowerCase().indexOf('estagi')>=0}
 function atualizarDicaMatricula(){const ct=document.getElementById('fu-contrato').value;const input=document.getElementById('fu-matricula');if(input)input.required=!ehEstagiarioContrato(ct)}
+/* ===== COR POR FUNCIONÁRIO ===== */
+let corSelecionada='';
+function renderCorPicker(selecionada){const pick=document.getElementById('fu-cor-picker');if(!pick)return;corSelecionada=selecionada||'';let h='';CORES_PICKER.forEach(c=>{h+='<div class="cor-opt'+(corSelecionada===c?' sel':'')+'" style="background:'+c+'" title="'+c+'" onclick="escolherCor(\''+c+'\')"></div>'});h+='<div class="cor-opt'+(corSelecionada===''?' sel':'')+'" style="background:repeating-linear-gradient(45deg,#ccc,#ccc 4px,#eee 4px,#eee 8px)" title="Automática (pelo nome)" onclick="escolherCor(\'\')"></div>';h+='<button class="btn btn-ghost btn-small" style="margin-left:4px" onclick="escolherCor(coresAleatoria())">🎲 Aleatória</button>';pick.innerHTML=h}
+function coresAleatoria(){let c;do{c=CORES_PICKER[Math.floor(Math.random()*CORES_PICKER.length)]}while(c===corSelecionada);return c}
+function escolherCor(c){renderCorPicker(c)}
 /* ===== CRUD CARGO ===== */
 function abrirCargoCadastro(){abrirMG('Criar cargo','<div class="field"><label>Nome do cargo</label><input id="cc-nome" placeholder="Ex.: Assistente Administrativo"></div>','<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Cancelar</button><button class="btn" onclick="salvarCargoRapido()">Salvar cargo</button>')}
 function salvarCargoRapido(){const nome=document.getElementById('cc-nome').value.trim();if(!nome){alert('Informe o cargo');return}const c=load('cargos');if(c.includes(nome)){alert('Cargo já existe');return}c.push(nome);save('cargos',c);preencherSelects();const sel=document.getElementById('fu-cargo');if(sel&&[...sel.options].some(o=>o.text===nome))sel.value=nome;fecharModal('modal-generic')}
@@ -481,7 +475,7 @@ function salvarEdicaoContrato(){const atual=document.getElementById('ec2-atual')
 function abrirExcluirContrato(){const c=load('contratos');if(!c.length){alert('Nenhum contrato cadastrado');return}const body=c.map(x=>'<div class="pf-list-item"><div class="pli-main">'+x+'</div><button class="btn btn-small btn-danger" onclick="excluirContratoDef(\''+x.replace(/'/g,"\\'")+'\')">Excluir</button></div>').join('');abrirMG('Excluir contrato',body,'<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>')}
 function excluirContratoDef(nome){abrirConfirm('Excluir contrato','Deseja excluir o contrato "'+nome+'"? Funcionários com esse contrato ficarão sem contrato.',function(){let c=load('contratos');c=c.filter(x=>x!==nome);save('contratos',c);let f=getFuncionarios();f.forEach(x=>{if(x.contrato===nome)x.contrato=''});save('funcionarios',f);fecharModal('modal-generic');renderTudo()})}
 /* ===== QUANTIDADE DE HORÁRIOS ===== */
-function abrirQtdCadastro(){abrirMG('Criar quantidade de horários','<div class="field"><label>Quantidade (par)</label><input id="cq-nome" type="number" min="2" step="2" placeholder="Ex.: 4 ou 6"></div><div class="alert-info">4 horários: Entrada, Saída Almoço, Entrada Almoço, Saída. 6 horários: três períodos de entrada e saída.</div>','<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Cancelar</button><button class="btn" onclick="salvarQtdRapido()">Salvar</button>')}
+function abrirQtdCadastro(){abrirMG('Criar quantidade de horários','<div class="field"><label>Quantidade (par)</label><input id="cq-nome" type="number" min="2" step="2" placeholder="Ex.: 4 ou 6"></div><div class="alert-info"><b>Regra</b>4 horários: Entrada, Saída Almoço, Entrada Almoço, Saída. 6 horários: três períodos de entrada e saída.</div>','<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Cancelar</button><button class="btn" onclick="salvarQtdRapido()">Salvar</button>')}
 function salvarQtdRapido(){const v=parseInt(document.getElementById('cq-nome').value);if(!v||v<2||v%2!==0){alert('Informe uma quantidade par (ex.: 4, 6, 8)');return}const qs=load('quantidades');const chave=String(v);if(qs.includes(chave)){alert('Essa quantidade já existe');return}qs.push(chave);qs.sort((a,b)=>a-b);save('quantidades',qs);popularQtdSelect('pt-qtd');fecharModal('modal-generic');const psel=document.getElementById('pt-qtd');if(psel)psel.value=chave;if(document.getElementById('pt-campos'))renderPtCampos()}
 /* ===== REMANEJAR ===== */
 function abrirRemanejar(){const cargos=load('cargos'),deps=load('departamentos'),secs=load('secretarias'),cts=load('contratos');if(!cargos.length&&!deps.length&&!secs.length&&!cts.length){alert('Crie ao menos um cargo, departamento, secretaria ou contrato primeiro');return}const body='<div class="field"><label>Tipo</label><select id="rm-tipo" onchange="atualizarRMOpcoes()"><option value="cargo">Cargo</option><option value="departamento">Departamento</option><option value="secretaria">Secretaria</option><option value="contrato">Contrato</option></select></div><div id="rm-campos"></div>';abrirMG('Remanejar funcionários',body,'<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Cancelar</button><button class="btn" onclick="salvarRemanejar()">Aplicar remanejamento</button>');atualizarRMOpcoes()}
@@ -496,33 +490,84 @@ function excluirEmCascata(id,nome){let fs=getFuncionarios();fs=fs.filter(f=>Stri
 function excluirLoteSelecionados(){if(!loteSel.size){alert('Selecione ao menos um funcionário com a caixa da esquerda');return}abrirConfirm('Apagar em lote','Deseja excluir '+loteSel.size+' funcionário(s) selecionado(s)? Pontos, férias, escalas e atestados deles também serão excluídos.',function(){let targets=[];getFuncionarios().forEach(f=>{if(loteSel.has(String(f.id)))targets.push({id:f.id,nome:f.nome})});targets.forEach(t=>excluirEmCascata(t.id,t.nome));cancelarLote();renderTudo()})}
 /* ===== FUNCIONÁRIOS ===== */
 let funcEditando=null;
-function novaFuncionario(){funcEditando=null;document.getElementById('fu-titulo').textContent='Cadastro de Funcionário';document.getElementById('fu-excluir-btn').style.display='none';document.getElementById('fu-nome').value='';document.getElementById('fu-matricula').value='';preencherSelects();document.getElementById('fu-cargo').value='';document.getElementById('fu-departamento').value='';document.getElementById('fu-secretaria').value='';document.getElementById('fu-contrato').value='Efetivo';atualizarDicaMatricula();abrirModal('modal-funcionario')}
-function abrirEditarFuncionario(id){const f=getFuncById(id);if(!f)return;funcEditando=String(f.id);preencherSelects();document.getElementById('fu-nome').value=f.nome;document.getElementById('fu-matricula').value=f.matricula;document.getElementById('fu-cargo').value=f.cargo||'';document.getElementById('fu-departamento').value=f.departamento||'';document.getElementById('fu-secretaria').value=f.secretaria||'';const ctSel=document.getElementById('fu-contrato');ctSel.value=(f.contrato&&[...ctSel.options].some(o=>o.value===f.contrato))?f.contrato:'Efetivo';document.getElementById('fu-titulo').textContent='Editar Funcionário';document.getElementById('fu-excluir-btn').style.display='inline-flex';atualizarDicaMatricula();abrirModal('modal-funcionario')}
-function salvarFuncionario(){const nome=document.getElementById('fu-nome').value.trim(),matricula=document.getElementById('fu-matricula').value.trim();const cargo=document.getElementById('fu-cargo').value,dep=document.getElementById('fu-departamento').value,sec=document.getElementById('fu-secretaria').value;const contrato=document.getElementById('fu-contrato').value;if(!nome){alert('Preencha o nome');return}if(!ehEstagiarioContrato(contrato)&&!matricula){alert('Matrícula é obrigatória para o contrato "'+contrato+'". Estagiários podem deixar em branco.');return}const d=getFuncionarios();let id=funcEditando;if(!id)id='f'+Date.now()+'_'+Math.floor(Math.random()*99999);const obj={id,nome,matricula,cargo,departamento:dep,secretaria:sec,contrato};if(funcEditando){const i=d.findIndex(x=>String(x.id)===String(funcEditando));if(i>=0)d[i]=obj}else d.push(obj);save('funcionarios',d);funcEditando=null;fecharModal('modal-funcionario');renderTudo()}
+function novaFuncionario(){funcEditando=null;document.getElementById('fu-titulo').textContent='Cadastro de Funcionário';document.getElementById('fu-excluir-btn').style.display='none';document.getElementById('fu-nome').value='';document.getElementById('fu-matricula').value='';document.getElementById('fu-contrato').value='Efetivo';renderCorPicker('');preencherSelects();abrirModal('modal-funcionario');atualizarDicaMatricula()}
+function abrirEditarFuncionario(id){const f=getFuncById(id);if(!f)return;funcEditando=String(f.id);
+  preencherSelects();
+  document.getElementById('fu-titulo').textContent='Editar Funcionário';
+  document.getElementById('fu-excluir-btn').style.display='inline-flex';
+  document.getElementById('fu-nome').value=f.nome;
+  document.getElementById('fu-matricula').value=f.matricula||'';
+  const selC=document.getElementById('fu-cargo');
+  if(f.cargo){if(![...selC.options].some(o=>o.value===f.cargo||o.text===f.cargo))selC.innerHTML+='<option>'+f.cargo+'</option>';selC.value=f.cargo}
+  const selD=document.getElementById('fu-departamento');
+  if(f.departamento){if(![...selD.options].some(o=>o.value===f.departamento||o.text===f.departamento))selD.innerHTML+='<option>'+f.departamento+'</option>';selD.value=f.departamento}
+  const selS=document.getElementById('fu-secretaria');
+  if(f.secretaria){if(![...selS.options].some(o=>o.value===f.secretaria||o.text===f.secretaria))selS.innerHTML+='<option>'+f.secretaria+'</option>';selS.value=f.secretaria}
+  const ctSel=document.getElementById('fu-contrato');
+  if(f.contrato){if(![...ctSel.options].some(o=>o.value===f.contrato))ctSel.innerHTML+='<option>'+f.contrato+'</option>';ctSel.value=f.contrato}
+  renderCorPicker(f.cor||'');
+  atualizarDicaMatricula();
+  abrirModal('modal-funcionario');
+}
+function salvarFuncionario(){const nome=document.getElementById('fu-nome').value.trim(),matricula=document.getElementById('fu-matricula').value.trim();const cargo=document.getElementById('fu-cargo').value,dep=document.getElementById('fu-departamento').value,sec=document.getElementById('fu-secretaria').value;const contrato=document.getElementById('fu-contrato').value;if(!nome){alert('Preencha o nome');return}if(!ehEstagiarioContrato(contrato)&&!matricula){alert('Matrícula é obrigatória para o contrato "'+contrato+'". Estagiários podem deixar em branco.');return}const d=getFuncionarios();let id=funcEditando;if(!id)id='f'+Date.now()+'_'+Math.floor(Math.random()*99999);const obj={id,nome,matricula,cargo,departamento:dep,secretaria:sec,contrato,cor:corSelecionada||''};if(funcEditando){const i=d.findIndex(x=>String(x.id)===String(funcEditando));if(i>=0)d[i]=obj}else d.push(obj);save('funcionarios',d);funcEditando=null;fecharModal('modal-funcionario');renderTudo()}
 function abrirExcluirFuncionario(id){fecharModal('modal-funcionario');const f=getFuncById(id);abrirConfirm('Excluir funcionário','Deseja excluir o funcionário "'+(f?f.nome:'')+'"? Pontos, férias, escalas e atestados dele também serão excluídos.',function(){excluirFuncionarioNow(id)})}
 function excluirFuncionario(id){abrirExcluirFuncionario(id)}
 function excluirFuncionarioNow(id){const f=getFuncById(id);if(!f)return;excluirEmCascata(id,f.nome);fecharModal('modal-funcionario');renderTudo()}
-function renderFuncionarios(){const d=getFuncionarios();const thead=document.getElementById('tbl-func-head');thead.innerHTML=(loteMode?'<th style="text-align:center;width:36px">Sel</th>':'')+'<th>Nome Completo</th><th>Matrícula</th><th>Cargo</th><th>Departamento</th><th>Secretaria</th><th>Contrato</th><th>Ações</th>';document.getElementById('tbl-funcionarios').innerHTML=d.length?d.map(f=>'<tr>'+(loteMode?'<td class="check-cell"><input type="checkbox" '+(loteSel.has(String(f.id))?'checked':'')+' onchange="toggleLote(\''+f.id+'\')"></td>':'')+'<td><b>'+f.nome+'</b></td><td>'+(f.matricula||'-')+'</td><td>'+(f.cargo||'-')+'</td><td>'+(f.departamento||'-')+'</td><td>'+(f.secretaria||'-')+'</td><td><span class="badge tipo">'+(f.contrato||'-')+'</span></td><td><div class="row-actions"><button title="Editar" onclick="abrirEditarFuncionario(\''+f.id+'\')">✏️</button><button title="Excluir" class="danger" onclick="excluirFuncionario(\''+f.id+'\')">🗑️</button></div></td></tr>').join(''):'<tr><td colspan="'+(loteMode?8:7)+'"><div class="empty"><span class="e-ico">👥</span>Nenhum funcionário cadastrado.</div></td></tr>'}
-/* ===== IMPRIMIR PONTO (abre o ponto-digital.html daquele funcionário e baixa o Excel) ===== */
+function renderFuncionarios(){const d=getFuncionarios();const thead=document.getElementById('tbl-func-head');thead.innerHTML=(loteMode?'<th style="text-align:center;width:36px">Sel</th>':'')+'<th>Nome Completo</th><th>Matrícula</th><th>Cargo</th><th>Departamento</th><th>Secretaria</th><th>Contrato</th><th>Cor</th><th>Ações</th>';document.getElementById('tbl-funcionarios').innerHTML=d.length?d.map(f=>'<tr>'+(loteMode?'<td class="check-cell"><input type="checkbox" '+(loteSel.has(String(f.id))?'checked':'')+' onchange="toggleLote(\''+f.id+'\')"></td>':'')+'<td><b>'+f.nome+'</b></td><td>'+(f.matricula||'-')+'</td><td>'+(f.cargo||'-')+'</td><td>'+(f.departamento||'-')+'</td><td>'+(f.secretaria||'-')+'</td><td><span class="badge tipo">'+(f.contrato||'-')+'</span></td><td><span title="'+(f.cor||'Automática')+'" style="display:inline-block;width:18px;height:18px;border-radius:50%;background:'+(f.cor||corFuncionario(f.nome))+';vertical-align:middle"></span></td><td><div class="row-actions"><button title="Editar" onclick="abrirEditarFuncionario(\''+f.id+'\')">✏️</button><button title="Excluir" class="danger" onclick="excluirFuncionario(\''+f.id+'\')">🗑️</button></div></td></tr>').join(''):'<tr><td colspan="'+(loteMode?9:8)+'"><div class="empty"><span class="e-ico">👥</span>Nenhum funcionário cadastrado.</div></td></tr>'}
+/* ===== IMPRIMIR PONTO ===== */
 function imprimirPontoExcel(nome){
   const f=getFuncionarios().find(x=>x.nome===nome);
   if(!f){alert('Funcionário não encontrado');return}
-  const agora=new Date();
-  const ini=agora.getFullYear()+'-'+String(agora.getMonth()+1).padStart(2,'0')+'-01';
-  const fim=agora.getFullYear()+'-'+String(agora.getMonth()+1).padStart(2,'0')+'-'+new Date(agora.getFullYear(),agora.getMonth()+1,0).getDate();
+  const periodo=periodoPontoVigente(f.contrato);
+  const ini=periodo?periodo.inicio:(new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0')+'-01');
+  const fim=periodo?periodo.fim:isoDe(new Date(new Date().getFullYear(),new Date().getMonth()+1,0));
   const url='ponto-digital.html?funcionario='+encodeURIComponent(nome)+'&inicio='+ini+'&fim='+fim+'&excel=1';
   window.open(url,'_blank');
 }
-/* ===== PONTO (eixos invertidos) ===== */
+/* ===== PONTO ===== */
 let pontoModoPerfil=false,pontoFuncId=null;
-function renderPtCampos(){const qtd=parseInt(document.getElementById('pt-qtd').value)||4;const labels=getLabels(qtd),defs=getDefaults(qtd);const grp=document.getElementById('pt-campos');let h='<div class="field-row">';for(let i=0;i<qtd;i++){h+='<div class="field"><label>'+labels[i]+'</label><input type="time" id="pt-h'+i+'"></div>'+(i%2===1&&i<qtd-1?'</div><div class="field-row">':'')}h+='</div>';grp.innerHTML=h;const sel=document.getElementById('pt-func');const fid=pontoModoPerfil&&perfilFunc?perfilFunc.id:(sel?sel.value:'');const rec=getPontoDe(fid);for(let i=0;i<qtd;i++){const el=document.getElementById('pt-h'+i);if(el)el.value=(rec&&rec.horarios&&rec.horarios[i])?rec.horarios[i].time:defs[i]}}
-function ptFuncMudou(){const fid=document.getElementById('pt-func').value;const f=getFuncById(fid);const rec=getPontoDe(fid);if(rec&&rec.horarios){document.getElementById('pt-qtd').value=String(rec.horarios.length)}else{document.getElementById('pt-qtd').value=String((f&&qtdAutoContrato(f.contrato))||4)}renderPtCampos()}
-function abrirModalPonto(fid){pontoModoPerfil=!!perfilFunc&&(fid===perfilFunc.id);pontoFuncId=fid||(perfilFunc?perfilFunc.id:(document.getElementById('pt-func').value||''));const rec=getPontoDe(pontoFuncId);document.getElementById('pt-titulo').textContent=(rec?'Editar':'Cadastrar')+' Ponto de '+(rec?rec.nome:(getFuncById(pontoFuncId)?getFuncById(pontoFuncId).nome:''));if(pontoModoPerfil){document.getElementById('pt-func-wrap').style.display='none'}else{document.getElementById('pt-func-wrap').style.display='';preencherSelects();const sel=document.getElementById('pt-func');if(pontoFuncId){if(![...sel.options].some(o=>o.value===String(pontoFuncId))){const f=getFuncById(pontoFuncId);if(f)sel.innerHTML='<option value="'+f.id+'">'+f.nome+'</option>'+sel.innerHTML}sel.value=String(pontoFuncId)}}if(rec&&rec.horarios){document.getElementById('pt-qtd').value=String(rec.horarios.length)}else{document.getElementById('pt-qtd').value=pontoFuncId?String((getFuncById(pontoFuncId)&&qtdAutoContrato(getFuncById(pontoFuncId).contrato))||4):'4'}renderPtCampos();document.getElementById('pt-excluir-btn').style.display=rec?'inline-flex':'none';abrirModal('modal-ponto')}
-function novoPonto(){pontoModoPerfil=false;pontoFuncId=null;document.getElementById('pt-titulo').textContent='Cadastrar Ponto';document.getElementById('pt-func-wrap').style.display='';preencherSelects();document.getElementById('pt-qtd').value='4';renderPtCampos();document.getElementById('pt-excluir-btn').style.display='none';abrirModal('modal-ponto')}
+function renderPtCampos(){const qtd=parseInt(document.getElementById('pt-qtd').value)||4;const labels=getLabels(qtd),defs=getDefaults(qtd);const grp=document.getElementById('pt-campos');let h='<div class="field-row">';for(let i=0;i<qtd;i++){h+='<div class="field"><label>'+labels[i]+'</label><input type="time" id="pt-h'+i+'"></div>'+(i%2===1&&i<qtd-1?'</div><div class="field-row">':'')}h+='</div>';grp.innerHTML=h;const fid=pontoFuncId;const rec=getPontoDe(fid);for(let i=0;i<qtd;i++){const el=document.getElementById('pt-h'+i);if(el)el.value=(rec&&rec.horarios&&rec.horarios[i])?rec.horarios[i].time:defs[i]}}
+function ptFuncMudou(){const fid=document.getElementById('pt-func').value;if(!pontoModoPerfil)pontoFuncId=fid;const f=getFuncById(fid);const rec=getPontoDe(fid);if(rec&&rec.horarios){document.getElementById('pt-qtd').value=String(rec.horarios.length)}else{document.getElementById('pt-qtd').value=String((f&&qtdAutoContrato(f.contrato))||4)}renderPtCampos()}
+function abrirModalPonto(fid){
+  if(!fid){alert('Selecione um funcionário');return}
+  pontoFuncId=String(fid);
+  pontoModoPerfil=false;
+  const f=getFuncById(pontoFuncId);
+  if(!f){alert('Funcionário não encontrado');return}
+  const rec=getPontoDe(pontoFuncId);
+  document.getElementById('pt-func-wrap').style.display='';
+  preencherSelects();
+  const sel=document.getElementById('pt-func');
+  sel.value=pontoFuncId;
+  document.getElementById('pt-titulo').textContent=(rec?'Editar':'Cadastrar')+' Ponto de '+f.nome;
+  if(rec&&rec.horarios){document.getElementById('pt-qtd').value=String(rec.horarios.length)}else{document.getElementById('pt-qtd').value=String(qtdAutoContrato(f.contrato)||4)}
+  renderPtCampos();
+  document.getElementById('pt-excluir-btn').style.display=rec?'inline-flex':'none';
+  abrirModal('modal-ponto');
+}
+function novoPonto(){const funcs=getFuncionarios();if(!funcs.length){alert('Cadastre um funcionário primeiro');return}pontoModoPerfil=false;pontoFuncId=funcs[0].id;document.getElementById('pt-titulo').textContent='Cadastrar Ponto';document.getElementById('pt-func-wrap').style.display='';preencherSelects();const sel=document.getElementById('pt-func');sel.value=pontoFuncId;const f=getFuncById(pontoFuncId);document.getElementById('pt-qtd').value=String(qtdAutoContrato(f.contrato)||4);renderPtCampos();document.getElementById('pt-excluir-btn').style.display='none';abrirModal('modal-ponto')}
 function abrirEditarPonto(fid){abrirModalPonto(fid)}
-function salvarPonto(){let fid=pontoModoPerfil?(perfilFunc?perfilFunc.id:''):pontoFuncId||document.getElementById('pt-func').value;if(!fid)fid=document.getElementById('pt-func').value;const f=getFuncById(fid);if(!f){alert('Selecione um funcionário');return}const qtd=parseInt(document.getElementById('pt-qtd').value)||4;const labels=getLabels(qtd);const horarios=[];for(let i=0;i<qtd;i++){const el=document.getElementById('pt-h'+i);if(!el.value){alert('Preencha todos os horários');return}horarios.push({label:labels[i],time:el.value})}const horas=horasDoPonto(horarios.map(x=>x.time));const pts=load('pontos');let rec=pts.find(p=>String(p.funcId)===String(fid));if(rec){rec.nome=f.nome;rec.contrato=f.contrato||'';rec.horarios=horarios;rec.horas=horas}else pts.push({funcId:fid,nome:f.nome,contrato:f.contrato||'',horarios,horas});save('pontos',pts);fecharModal('modal-ponto');renderTudo()}
-function abrirExcluirPonto(){const fid=pontoModoPerfil?(perfilFunc?perfilFunc.id:''):pontoFuncId||document.getElementById('pt-func').value;const rec=getPontoDe(fid);if(!rec){alert('Este funcionário ainda não tem ponto cadastrado');return}abrirConfirm('Excluir ponto','Deseja excluir o ponto de '+(rec.nome||'este funcionário')+'?',function(){let pts=load('pontos');pts=pts.filter(p=>String(p.funcId)!==String(fid));save('pontos',pts);fecharModal('modal-ponto');renderTudo()})}
-function excluirPonto(fid){pontoFuncId=fid;pontoModoPerfil=!!(perfilFunc&&perfilFunc.id===fid);abrirExcluirPonto()}
+function salvarPonto(){
+  const fid=pontoFuncId||document.getElementById('pt-func').value;
+  const f=getFuncById(fid);
+  if(!f){alert('Selecione um funcionário');return}
+  const qtd=parseInt(document.getElementById('pt-qtd').value)||4;const labels=getLabels(qtd);
+  const horarios=[];
+  for(let i=0;i<qtd;i++){const el=document.getElementById('pt-h'+i);if(!el.value){alert('Preencha todos os horários');return}horarios.push({label:labels[i],time:el.value})}
+  const horas=horasDoPonto(horarios.map(x=>x.time));
+  const pts=load('pontos');
+  let rec=pts.find(p=>String(p.funcId)===String(fid));
+  if(rec){rec.nome=f.nome;rec.contrato=f.contrato||'';rec.horarios=horarios;rec.horas=horas}else pts.push({funcId:String(fid),nome:f.nome,contrato:f.contrato||'',horarios,horas});
+  save('pontos',pts);pontoFuncId=null;fecharModal('modal-ponto');renderTudo();
+}
+function abrirExcluirPonto(){
+  const fid=pontoFuncId||document.getElementById('pt-func').value;
+  const rec=getPontoDe(fid);
+  if(!rec){alert('Este funcionário ainda não tem ponto cadastrado');return}
+  abrirConfirm('Excluir ponto','Deseja excluir o ponto de '+(rec.nome||'este funcionário')+'?',function(){let pts=load('pontos');pts=pts.filter(p=>String(p.funcId)!==String(fid));save('pontos',pts);pontoFuncId=null;fecharModal('modal-ponto');renderTudo()})
+}
+function excluirPonto(fid){abrirModalPontoExcluir(fid)}
+function abrirModalPontoExcluir(fid){const rec=getPontoDe(fid);if(!rec){alert('Este funcionário ainda não tem ponto cadastrado');return}abrirConfirm('Excluir ponto','Deseja excluir o ponto de '+(rec.nome||'este funcionário')+'?',function(){let pts=load('pontos');pts=pts.filter(p=>String(p.funcId)!==String(fid));save('pontos',pts);renderTudo()})}
 function renderPonto(){
   const busca=(document.getElementById('ponto-busca').value||'').toLowerCase();
   const dAll=getFuncionarios();
@@ -535,7 +580,7 @@ function renderPonto(){
   let hours='';for(let h=HORA_INI;h<=HORA_FIM;h++){hours+='<div class="tlP-hour">'+String(h).padStart(2,'0')+':00</div>'}
   let rows='';
   funcs.forEach(f=>{
-    const cor=corFuncionario(f.nome),ini=iniciais(f.nome);
+    const cor=corDe(f),ini=iniciais(f.nome);
     const rec=pts.find(p=>String(p.funcId)===String(f.id));
     let linhas='';for(let h=HORA_INI;h<=HORA_FIM;h++){const left=((h-HORA_INI)*60/totalMin)*100;linhas+='<div class="tlP-linha" style="left:'+left+'%"></div>'}
     let bar='';
@@ -544,69 +589,214 @@ function renderPonto(){
       const t0=timeToMin(hs[0]),tN=timeToMin(hs[hs.length-1]);
       const left=((t0-HORA_INI*60)/totalMin)*100;
       const width=Math.max(2,((tN-t0)/totalMin)*100);
-      bar='<div class="tlP-bar" style="left:'+left+'%;width:'+width+'%;background:'+cor+'" title="'+f.nome+' • '+hs.join(' • ')+'" onclick="abrirModalPonto(\''+f.id+'\')"><span class="tbP-av" style="color:'+cor+';border:2px solid '+cor+'">'+ini+'</span> '+hs[0]+' | '+hs[hs.length-1]+'</div>';
+      bar='<div class="tlP-bar" style="left:'+left+'%;width:'+width+'%;background:'+cor+'" title="'+f.nome+' • '+hs.join(' • ')+'" data-fid="'+f.id+'"><span class="tbP-av" style="color:'+cor+';border:2px solid '+cor+'">'+ini+'</span> '+hs[0]+' | '+hs[hs.length-1]+'</div>';
     }
     const idx=dAll.indexOf(f);
     rows+='<div class="tlP-row"><div class="tlP-name" onclick="abrirPerfil('+idx+')" title="'+f.nome+'"><span class="tfP-av" style="color:'+cor+';border:2px solid '+cor+'">'+ini+'</span><span class="tfP-nm">'+f.nome+'</span></div><div class="tlP-track">'+linhas+bar+'</div></div>';
   });
   el.innerHTML='<div class="tlP"><div class="tlP-head"><div class="tlP-corner">Funcionário</div><div class="tlP-hours">'+hours+'</div></div><div class="tlP-rows">'+rows+'</div></div>';
 }
-function renderPontos(){const pts=load('pontos').slice().sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));document.getElementById('tbl-pontos').innerHTML=pts.length?pts.map(p=>'<tr><td><b>'+(p.nome||'-')+'</b></td><td><span class="badge tipo">'+(p.contrato||'-')+'</span></td><td>'+(p.horarios?p.horarios.map(h=>h.time).join(' • '):'-')+'</td><td><div class="row-actions"><button title="Visualizar no Ponto" onclick="document.getElementById(\'ponto-busca\').value=\''+(p.nome||'')+'\';go(\'ponto\')">👁️</button><button title="Editar" onclick="abrirEditarPonto(\''+p.funcId+'\')">✏️</button><button title="Excluir" class="danger" onclick="excluirPonto(\''+p.funcId+'\')">🗑️</button></div></td></tr>').join(''):'<tr><td colspan="4"><div class="empty"><span class="e-ico">💾</span>Nenhum ponto cadastrado ainda.</div></td></tr>';const totalHoras=pts.reduce((s,p)=>s+(p.horas||0),0);document.getElementById('stats-pontos').innerHTML='<div class="stat"><div class="s-num">'+pts.length+'</div><div class="s-label">Pontos</div></div><div class="stat"><div class="s-num">'+totalHoras.toFixed(1)+'h</div><div class="s-label">Horas/dia somadas</div></div><div class="stat"><div class="s-num">'+getFuncionarios().length+'</div><div class="s-label">Funcionários</div></div>'}
-function imprimirPonto(){window.print()}
+/* Clique na barra: abre o ponto do funcionário correto via data-fid */
+document.addEventListener('click',function(e){
+  const bar=e.target.closest?e.target.closest('.tlP-bar'):null;
+  if(bar&&bar.dataset.fid){e.stopPropagation();abrirModalPonto(bar.dataset.fid)}
+});
+/* ===== DIAS DE PONTO POR CONTRATO — REGRAS RECORRENTES (qualquer mês/ano) =====
+   Cada contrato tem UMA regra: diaIni (início da competência em um mês) e
+   diaFim (fim da competência no MÊS SEGUINTE). Padrões:
+   Efetivo 11→10 • Estagiário de Ensino Superior 16→15 • Estagiário de Ensino Médio 26→25 */
+const PADRAO_DIA_INI={'Efetivo':11,'Estagiário de Ensino Superior':16,'Estagiário de Ensino Médio':26};
+function listaContratos(){const c=load('contratos');return (c.length?c:CONTRATOS_PADRAO.slice())}
+function regraPontoContrato(contrato){
+  const r=load('contratos_ponto').find(p=>p&&String(p.contrato)===String(contrato));
+  if(r&&r.diaIni)return {diaIni:+r.diaIni,diaFim:+r.diaFim};
+  const di=PADRAO_DIA_INI[String(contrato||'').trim()];
+  return di?{diaIni:di,diaFim:di-1}:null;
+}
+function periodoPontoVigente(contrato,ref){
+  const regra=regraPontoContrato(contrato);if(!regra)return null;
+  const r=ref?new Date(ref+'T12:00:00'):new Date();
+  let ini=new Date(r.getFullYear(),r.getMonth(),regra.diaIni);
+  if(r.getDate()<regra.diaIni){ini=new Date(r.getFullYear(),r.getMonth()-1,regra.diaIni)}
+  const fim=new Date(ini.getFullYear(),ini.getMonth()+1,regra.diaFim);
+  return {inicio:isoDe(ini),fim:isoDe(fim)};
+}
+function getPeriodosPonto(contrato){const regra=regraPontoContrato(contrato);if(!regra)return [];const p=periodoPontoVigente(contrato);return p?[p]:[]}
+function dataNoPeriodoPonto(iso,contrato){
+  const d=String(iso||'').slice(0,10);if(!d)return false;
+  const vig=periodoPontoVigente(contrato,d);
+  return !!vig&&d>=vig.inicio&&d<=vig.fim;
+}
+function abrirPontoDias(){
+  const lista=listaContratos();
+  const regras=load('contratos_ponto').filter(p=>p&&p.diaIni);
+  const padroes=lista.map(c=>{
+    const r=regras.find(x=>String(x.contrato)===String(c));
+    const def=PADRAO_DIA_INI[String(c).trim()];
+    const di=r?r.diaIni:(def||''),df=r?r.diaFim:(def?def-1:'');
+    return {contrato:c,diaIni:di,diaFim:df,personalizado:!!r};
+  });
+  const body='<div class="alert-info"><b>Como funciona</b>Cada contrato tem uma <b>regra recorrente</b>: a competência de ponto começa no "Dia início" de um mês e termina no "Dia fim" do <b>mês seguinte</b>, valendo para <b>qualquer mês e qualquer ano</b>.<br><b>Padrões:</b> Efetivo: dia 11 → dia 10 • Estagiário de Ensino Superior: dia 16 → dia 15 • Estagiário de Ensino Médio: dia 26 → dia 25.</div>'
+  +'<div class="field"><label>Contrato</label><select id="pd-contrato" onchange="pdContratoMudou()">'+lista.map(c=>'<option value="'+c.replace(/"/g,'&quot;')+'">'+c+'</option>').join('')+'</select></div>'
+  +'<div class="field-row"><div class="field"><label>Dia início (do mês)</label><input type="number" id="pd-diaIni" min="1" max="31"></div><div class="field"><label>Dia fim (do mês seguinte)</label><input type="number" id="pd-diaFim" min="1" max="31"></div></div>'
+  +'<div class="field-hint" id="pd-hint"></div>'
+  +'<button class="btn btn-small" style="margin-top:8px" onclick="salvarRegraPonto()">💾 Salvar regra deste contrato</button>'
+  +'<div style="margin-top:14px"><b style="font-size:11px;color:var(--azul-escuro)">Regras cadastradas</b>'
+  +padroes.map(p=>'<div class="pf-list-item" style="cursor:default"><div><div class="pli-main">'+p.contrato+(p.personalizado?'':' <span class="badge tipo">padrão</span>')+'</div><div class="pli-sub">Dia '+p.diaIni+' de um mês até dia '+p.diaFim+' do mês seguinte</div></div><div class="row-actions"><button title="Editar" onclick="editarRegraPonto(\''+p.contrato.replace(/'/g,"\\'")+'\')">✏️</button>'+(p.personalizado?'<button title="Restaurar padrão / excluir" class="danger" onclick="excluirRegraPonto(\''+p.contrato.replace(/'/g,"\\'")+'\')">🗑️</button>':'')+'</div></div>').join('')
+  +'</div>';
+  abrirMG('Dias de Ponto por Contrato (regras recorrentes)',body,'<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>');
+  pdContratoMudou();
+}
+function pdContratoMudou(){
+  const c=document.getElementById('pd-contrato').value;
+  const regras=load('contratos_ponto').filter(p=>p&&p.diaIni);
+  const r=regras.find(x=>String(x.contrato)===String(c));
+  const def=PADRAO_DIA_INI[String(c).trim()];
+  document.getElementById('pd-diaIni').value=r?r.diaIni:(def||'');
+  document.getElementById('pd-diaFim').value=r?r.diaFim:(def?def-1:'');
+  const vig=periodoPontoVigente(c);
+  document.getElementById('pd-hint').innerHTML=vig?('<b>Exemplo atual:</b> competência de '+fmtData(vig.inicio)+' até '+fmtData(vig.fim)+' — mesma regra vale para qualquer mês/ano.'):'';
+}
+function salvarRegraPonto(){
+  const c=document.getElementById('pd-contrato').value;
+  const di=parseInt(document.getElementById('pd-diaIni').value),df=parseInt(document.getElementById('pd-diaFim').value);
+  if(!c){alert('Selecione um contrato');return}
+  if(!di||di<1||di>31||!df||df<1||df>31){alert('Informe dias válidos entre 1 e 31');return}
+  const d=load('contratos_ponto').filter(p=>p&&p.contrato);
+  const i=d.findIndex(x=>String(x.contrato)===String(c));
+  const obj={contrato:c,diaIni:di,diaFim:df};
+  if(i>=0)d[i]=obj;else d.push(obj);
+  save('contratos_ponto',d);fecharModal('modal-generic');renderTudo();abrirPontoDias();
+}
+function editarRegraPonto(c){
+  const sel=document.getElementById('pd-contrato');
+  if(sel){sel.value=c;pdContratoMudou()}
+}
+function excluirRegraPonto(c){
+  abrirConfirm('Excluir regra','Deseja excluir a regra personalizada de "'+c+'"? O contrato voltará a usar o padrão do sistema (se existir).',function(){
+    let d=load('contratos_ponto').filter(p=>p&&p.contrato);
+    d=d.filter(x=>String(x.contrato)!==String(c));
+    save('contratos_ponto',d);fecharModal('modal-generic');renderTudo();abrirPontoDias();
+  });
+}
 </script>
 <script>
-/* ===== ESCALA (com APELIDO para a escala) ===== */
+/* ===== ESCALA ===== */
 function getEscalados(){return getFuncionarios().filter(f=>load('escalas').some(e=>String(e.matricula)===String(f.id)))}
-function renderEscala(){const funcs=getEscalados();const grid=document.getElementById('esc-grid');if(!funcs.length){grid.innerHTML='<div class="empty"><span class="e-ico">📅</span>Nenhum funcionário na escala. Use o botão "Incluir" para alocar um funcionário.</div>';return}grid.innerHTML=funcs.map(f=>{const cfg=getEscalaConfig(f.id),cor=corFuncionario(f.nome);const chips='<span class="esc-chip '+(cfg.local==='guiche'?'guiche':'senha')+'">'+(cfg.local==='guiche'?'🪟 Guichê':'🎫 Senha')+'</span>'+(cfg.fixo?'<span class="esc-chip fixo">🔒 Fixo no guichê</span>':'');const ap=(cfg.apelido?'<div class="esc-apelido">Apelido: <b style="color:var(--azul)">'+cfg.apelido+'</b></div>':'');return '<div class="esc-card" style="border-left:4px solid '+cor+'" onclick="abrirAlterarEscala(\''+f.id+'\')"><div class="esc-top"><div class="esc-avatar" style="background:'+cor+'">'+iniciais(f.nome)+'</div><div><div class="esc-nome">'+f.nome+'</div>'+ap+'<div style="font-size:10px;color:var(--texto-suave)">'+(f.cargo||'-')+' • '+(f.contrato||'-')+'</div><div style="margin-top:4px">'+chips+'</div></div></div><div style="font-size:10px;color:var(--azul);text-align:right;margin-top:6px">Clique para alterar ➡️</div></div>'}).join('')}
+function renderEscala(){const funcs=getEscalados();const grid=document.getElementById('esc-grid');if(!funcs.length){grid.innerHTML='<div class="empty"><span class="e-ico">📅</span>Nenhum funcionário na escala. Use o botão "Incluir" para alocar um funcionário.</div>';return}grid.innerHTML=funcs.map(f=>{const cfg=getEscalaConfig(f.id),cor=corDe(f);const chips='<span class="esc-chip '+(cfg.local==='guiche'?'guiche':'senha')+'">'+(cfg.local==='guiche'?'🪟 Guichê':'🎫 Senha')+'</span>'+(cfg.fixo?'<span class="esc-chip fixo">🔒 Fixo no guichê</span>':'');const ap=(cfg.apelido?'<div class="esc-apelido">Apelido: <b style="color:var(--azul)">'+cfg.apelido+'</b></div>':'');return '<div class="esc-card" style="border-left:4px solid '+cor+'" onclick="abrirAlterarEscala(\''+f.id+'\')"><div class="esc-top"><div class="esc-avatar" style="background:'+cor+'">'+iniciais(f.nome)+'</div><div><div class="esc-nome">'+f.nome+'</div>'+ap+'<div style="font-size:10px;color:var(--texto-suave)">'+(f.cargo||'-')+' • '+(f.contrato||'-')+'</div><div style="margin-top:4px">'+chips+'</div></div></div><div style="font-size:10px;color:var(--azul);text-align:right;margin-top:6px">Clique para alterar ➡️</div></div>'}).join('')}
 function abrirAlterarEscala(id){const f=getFuncById(id);if(!f)return;const cfg=getEscalaConfig(f.id);const body='<div class="field"><label>Funcionário</label><input value="'+f.nome+'" disabled style="background:var(--cinza)"></div><div class="field"><label>Apelido para a escala</label><input id="ae-apelido" value="'+cfg.apelido+'" placeholder="Ex.: Zé, Maria, Biro..."></div><div class="field"><label>Local de trabalho</label><select id="ae-local"><option value="senha" '+(cfg.local!=='guiche'?'selected':'')+'>🎫 Senha</option><option value="guiche" '+(cfg.local==='guiche'?'selected':'')+'>🪟 Guichê</option></select></div><div class="field-check"><input type="checkbox" id="ae-fixo" '+(cfg.fixo?'checked':'')+'> Fixo no guichê</div>';abrirMG('Escala de '+f.nome,body,'<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Cancelar</button><button class="btn" onclick="salvarEscalaConfig(\''+f.id+'\')">Salvar</button>')}
 function salvarEscalaConfig(id){if(!id){const s=document.getElementById('esc-func');id=s?s.value:''}if(!id){alert('Selecione um funcionário');return}const apelido=document.getElementById('ae-apelido')?document.getElementById('ae-apelido').value.trim():'';const local=document.getElementById('ae-local').value,fixo=document.getElementById('ae-fixo').checked;const f=getFuncById(id);if(!f)return;let e=load('escalas');let item=e.find(x=>String(x.matricula)===String(f.id));if(item){item.nome=f.nome;item.apelido=apelido;item.local=local;item.fixo=fixo}else e.push({matricula:f.id,nome:f.nome,apelido,local,fixo});save('escalas',e);const h=load('escala_hist');h.push({matricula:f.id,nome:f.nome,apelido,local,fixo,ts:new Date().toLocaleString('pt-BR')});save('escala_hist',h);fecharModal('modal-generic');renderTudo()}
 function novaEscala(){const funcs=getFuncionarios();if(!funcs.length){alert('Nenhum funcionário cadastrado');return}const body='<div class="field"><label>Funcionário</label><select id="esc-func">'+funcs.map(f=>'<option value="'+f.id+'">'+f.nome+'</option>').join('')+'</select></div><div class="field"><label>Apelido para a escala</label><input id="ae-apelido" placeholder="Ex.: Zé, Maria, Biro..."></div><div class="field"><label>Local de trabalho</label><select id="ae-local"><option value="senha">🎫 Senha</option><option value="guiche">🪟 Guichê</option></select></div><div class="field-check"><input type="checkbox" id="ae-fixo"> Fixo no guichê</div>';abrirMG('Incluir funcionário na escala',body,'<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Cancelar</button><button class="btn" onclick="salvarEscalaConfig(\'\')">Salvar</button>')}
 function excluirEscalaConfig(id){const f=getFuncById(id);abrirConfirm('Remover da escala','Deseja remover a configuração de escala de '+(f?f.nome:'este funcionário')+'?',function(){let e=load('escalas');e=e.filter(x=>String(x.matricula)!==String(id));save('escalas',e);renderTudo()})}
-function renderEscalas(){const e=load('escalas');document.getElementById('tbl-escalas').innerHTML=e.length?e.map(x=>'<tr><td><b>'+x.nome+'</b></td><td>'+(x.apelido?'<span class="badge ok">'+x.apelido+'</span>':'-')+'</td><td><span class="badge '+(x.local==='guiche'?'guiche':'senha')+'">'+(x.local==='guiche'?'Guichê':'Senha')+'</span></td><td>'+(x.fixo?'<span class="badge ok">Sim</span>':'<span class="badge tipo">Não</span>')+'</td><td><div class="row-actions"><button title="Editar" onclick="abrirAlterarEscala(\''+x.matricula+'\')">✏️</button><button title="Excluir" class="danger" onclick="excluirEscalaConfig(\''+x.matricula+'\')">🗑️</button></div></td></tr>').join(''):'<tr><td colspan="5"><div class="empty"><span class="e-ico">🗂️</span>Nenhuma escala cadastrada.</div></td></tr>';const hist={};load('escala_hist').forEach(ev=>{if(!hist[ev.matricula])hist[ev.matricula]={nome:ev.nome,fixo:0,sup:0,guiche:0,ult:''};if(ev.fixo)hist[ev.matricula].fixo++;else hist[ev.matricula].sup++;if(ev.local==='guiche')hist[ev.matricula].guiche++;hist[ev.matricula].ult=ev.ts});const rows=Object.values(hist).sort((a,b)=>(a.nome||'').localeCompare(b.nome||''));document.getElementById('tbl-histescala').innerHTML=rows.length?rows.map(x=>'<tr><td><b>'+x.nome+'</b></td><td><span class="badge fixo">'+x.fixo+'</span></td><td><span class="badge suplente">'+x.sup+'</span></td><td><span class="badge guiche">'+x.guiche+'</span></td><td style="font-size:10px;color:var(--texto-suave)">'+x.ult+'</td></tr>').join(''):'<tr><td colspan="5"><div class="empty">Sem histórico de escala ainda.</div></td></tr>'}
-function imprimirEscala(){window.print()}
-/* ===== FÉRIAS (linha do tempo) ===== */
+/* ===== FÉRIAS ===== */
 let fcY,fcM,feriasEditando=-1;
 (function(){const a=new Date();fcY=a.getFullYear();fcM=a.getMonth()})();
 function countMeses(){return 3}
 function feriasNav(dir){fcM+=dir;if(fcM<0){fcM=11;fcY--}if(fcM>11){fcM=0;fcY++}renderFerias()}
 function zebraBg(cores){const n=cores.length,w=n>2?4:7,parts=[];for(let i=0;i<n;i++)parts.push(cores[i]+' '+i*w+'px '+((i+1)*w)+'px');return 'repeating-linear-gradient(90deg,'+parts.join(',')+')'}
-function renderFerias(){const dados=load('ferias');const count=countMeses();let fy=fcY,fm=fcM+count-1;while(fm>11){fm-=12;fy++}document.getElementById('ferias-nav-label').textContent=MESES[fcM]+' '+fcY+' a '+MESES[fm]+' '+fy;const first=new Date(fcY,fcM,1);const start=new Date(fcY,fcM,1-first.getDay());const lastDay=new Date(fy,fm+1,0);const end=new Date(fy,fm+1,0+(6-lastDay.getDay()));const nWeeks=Math.ceil((Math.round((end-start)/86400000)+1)/7);let html='<div class="fc"><div class="fc-head"><div class="fc-label">Mês</div>'+DOWL.map(d=>'<div class="fc-dow">'+d.slice(0,1)+'</div>').join('')+'</div><div class="fc-weeks">';let prevMonth=null;for(let w=0;w<nWeeks;w++){const ws=new Date(start.getTime()+w*7*86400000),we=new Date(start.getTime()+(w*7+6)*86400000);const mw=ws.getMonth(),my=ws.getFullYear();const show=(mw!==prevMonth);prevMonth=mw;let cells='';for(let d=0;d<7;d++){const dt=new Date(start.getTime()+(w*7+d)*86400000);const dd=dt.getDate(),inRange=dt>=first&&dt<=lastDay;cells+='<div class="fc-cell '+(inRange?'':'other ')+(d===0?'dom ':'')+(d===6?'sab ':'')+'">'+dd+'</div>'}const itens=[];dados.forEach((r,idx)=>{if(!r.inicio)return;const s=new Date(r.inicio);let e=r.fim?new Date(r.fim):null;if(!e||isNaN(e)){e=new Date(s);e.setDate(e.getDate()+(r.dias||30))}if(e<ws||s>we)return;const a=s<ws?ws:s,b=e>we?we:e;const li=Math.max(0,Math.round((a-ws)/86400000)),ri=Math.min(6,Math.round((b-ws)/86400000));itens.push({idx,r,li,ri,offL:a>s,offR:b<e})});const pts=new Set([0,7]);itens.forEach(it=>{pts.add(it.li);pts.add(it.ri+1)});const frontier=[...pts].sort((x,y)=>x-y);let bars='';for(let i=0;i<frontier.length-1;i++){const x0=frontier[i],x1=frontier[i+1];if(x1<=x0)continue;const ativ=itens.filter(it=>it.li<=x0&&it.ri>=x1-1);if(!ativ.length)continue;const left=(x0/7)*100,width=((x1-x0)/7)*100;const r0=ativ[0].r,cor=corFuncionario(r0.nome),ini=iniciais(r0.nome);let bg;if(ativ.length===1){bg=cor}else{const cores=ativ.map(it=>corFuncionario(it.r.nome));bg=zebraBg(cores)}const lRound=ativ.some(it=>it.li===x0&&!it.offL),rRound=ativ.some(it=>it.ri===x1-1&&!it.offR);const av='<span class="fc-avatar">'+ini+'</span>';const lbl=(width>15)?av+r0.nome.split(' ')[0]:av;const ttl=ativ.map(it=>it.r.nome+' • '+fmtData(it.r.inicio)+' a '+fmtData(it.r.fim)+' ('+it.r.dias+'d)').join('\n');bars+='<div class="fc-bar '+(lRound?'fc-l':'')+' '+(rRound?'fc-r':'')+'" style="left:'+left+'%;width:'+width+'%;background:'+bg+'" title="'+ttl+'" onclick="event.stopPropagation();abrirEditarFerias('+ativ[0].idx+')">'+lbl+'</div>'}const labelCell='<div class="fc-mlabel'+(show?'':' fc-mlabel-empty')+'">'+(show?(MESES_CURTOS[mw]+' '+String(my).slice(2)):'')+'</div>';html+='<div class="fc-week">'+labelCell+'<div class="fc-cells">'+cells+bars+'</div></div>'}html+='</div></div>';document.getElementById('gantt-ferias').innerHTML=html}
-function renderHistFerias(){const d=load('ferias');const el=document.getElementById('gantt-histferias');if(!d.length){el.innerHTML='<div class="empty"><span class="e-ico">📋</span>Nenhuma férias registrada.</div>';return}const anos=[...new Set(d.map(r=>r.inicio?parseInt(r.inicio.slice(0,4)):null))].filter(n=>!isNaN(n));const cur=new Date().getFullYear();let minY=anos.length?Math.min.apply(null,anos):cur,maxY=anos.length?Math.max.apply(null,anos):cur;minY=Math.min(minY,cur-2);maxY=Math.max(maxY,cur+1);const totalMonths=(maxY-minY+1)*12;let head='<div class="hfc-head"><div class="hfc-label">Funcionário</div><div class="hfc-grid">';for(let y=minY;y<=maxY;y++)for(let mo=0;mo<12;mo++)head+='<div class="hfc-mon" title="'+MESES[mo]+' '+y+'">'+MESES_CURTOS[mo]+'</div>';head+='</div></div>';const byName={};d.forEach(r=>{if(!byName[r.nome])byName[r.nome]=[];byName[r.nome].push(r)});let rows='';Object.entries(byName).forEach(([nome,recs])=>{const cor=corFuncionario(nome),ini=iniciais(nome);let bars='';recs.forEach(r=>{if(!r.inicio)return;const iy=parseInt(r.inicio.slice(0,4)),im=parseInt(r.inicio.slice(5,7))-1;const fy2=r.fim?parseInt(r.fim.slice(0,4)):iy,fm2=r.fim?parseInt(r.fim.slice(5,7))-1:im;const idxIni=((iy-minY)*12+im),idxFim=((fy2-minY)*12+fm2);const left=(idxIni/totalMonths)*100;const w=Math.max(1.5,((idxFim-idxIni+1)/totalMonths)*100);const di=d.indexOf(r);bars+='<div class="hfc-bar" style="left:'+left+'%;width:'+w+'%;background:'+cor+'" title="'+nome+' • '+fmtData(r.inicio)+' a '+fmtData(r.fim)+' ('+r.dias+'d)" onclick="abrirEditarFerias('+di+')">'+MESES_CURTOS[im]+'</div>'});rows+='<div class="hfc-row"><div class="hfc-label"><span class="ha" style="background:'+cor+'">'+ini+'</span>'+nome+'</div><div class="hfc-track">'+bars+'</div></div>'});el.innerHTML='<div class="hfc">'+head+rows+'</div>'}
+function renderFerias(){const dados=load('ferias');const count=countMeses();let fy=fcY,fm=fcM+count-1;while(fm>11){fm-=12;fy++}document.getElementById('ferias-nav-label').textContent=MESES[fcM]+' '+fcY+' a '+MESES[fm]+' '+fy;const first=new Date(fcY,fcM,1);const start=new Date(fcY,fcM,1-first.getDay());const lastDay=new Date(fy,fm+1,0);const end=new Date(fy,fm+1,0+(6-lastDay.getDay()));const nWeeks=Math.ceil((Math.round((end-start)/86400000)+1)/7);let html='<div class="fc"><div class="fc-head"><div class="fc-label">Mês</div>'+DOWL.map(d=>'<div class="fc-dow">'+d.slice(0,1)+'</div>').join('')+'</div><div class="fc-weeks">';let prevMonth=null;for(let w=0;w<nWeeks;w++){const ws=new Date(start.getTime()+w*7*86400000),we=new Date(start.getTime()+(w*7+6)*86400000);const mw=ws.getMonth(),my=ws.getFullYear();const show=(mw!==prevMonth);prevMonth=mw;let cells='';for(let d=0;d<7;d++){const dt=new Date(start.getTime()+(w*7+d)*86400000);const dd=dt.getDate(),inRange=dt>=first&&dt<=lastDay;cells+='<div class="fc-cell '+(inRange?'':'other ')+(d===0?'dom ':'')+(d===6?'sab ':'')+'">'+dd+'</div>'}const itens=[];dados.forEach((r,idx)=>{if(!r.inicio)return;const s=new Date(r.inicio);let e=r.fim?new Date(r.fim):null;if(!e||isNaN(e)){e=new Date(s);e.setDate(e.getDate()+(r.dias||30))}if(e<ws||s>we)return;const a=s<ws?ws:s,b=e>we?we:e;const li=Math.max(0,Math.round((a-ws)/86400000)),ri=Math.min(6,Math.round((b-ws)/86400000));itens.push({idx,r,li,ri,offL:a>s,offR:b<e})});const pts=new Set([0,7]);itens.forEach(it=>{pts.add(it.li);pts.add(it.ri+1)});const frontier=[...pts].sort((x,y)=>x-y);let bars='';for(let i=0;i<frontier.length-1;i++){const x0=frontier[i],x1=frontier[i+1];if(x1<=x0)continue;const ativ=itens.filter(it=>it.li<=x0&&it.ri>=x1-1);if(!ativ.length)continue;const left=(x0/7)*100,width=((x1-x0)/7)*100;const funcR=getFuncionarios().find(g=>g.nome===ativ[0].r.nome);const cor=corDe(funcR||{nome:ativ[0].r.nome}),ini=iniciais(ativ[0].r.nome);let bg;if(ativ.length===1){bg=cor}else{const cores=ativ.map(it=>{const fr=getFuncionarios().find(g=>g.nome===it.r.nome);return corDe(fr||{nome:it.r.nome})});bg=zebraBg(cores)}const lRound=ativ.some(it=>it.li===x0&&!it.offL),rRound=ativ.some(it=>it.ri===x1-1&&!it.offR);const av='<span class="fc-avatar">'+ini+'</span>';const lbl=(width>15)?av+ativ[0].r.nome.split(' ')[0]:av;const ttl=ativ.map(it=>it.r.nome+' • '+fmtData(it.r.inicio)+' a '+fmtData(it.r.fim)+' ('+it.r.dias+'d)').join('\n');bars+='<div class="fc-bar '+(lRound?'fc-l':'')+' '+(rRound?'fc-r':'')+'" style="left:'+left+'%;width:'+width+'%;background:'+bg+'" title="'+ttl+'" onclick="event.stopPropagation();abrirEditarFerias('+ativ[0].idx+')">'+lbl+'</div>'}const labelCell='<div class="fc-mlabel'+(show?'':' fc-mlabel-empty')+'">'+(show?(MESES_CURTOS[mw]+' '+String(my).slice(2)):'')+'</div>';html+='<div class="fc-week">'+labelCell+'<div class="fc-cells">'+cells+bars+'</div></div>'}html+='</div></div>';document.getElementById('gantt-ferias').innerHTML=html}
+function renderHistFerias(){const d=load('ferias');const el=document.getElementById('gantt-histferias');if(!d.length){el.innerHTML='<div class="empty"><span class="e-ico">📋</span>Nenhuma férias registrada.</div>';return}const anos=[...new Set(d.map(r=>r.inicio?parseInt(r.inicio.slice(0,4)):null))].filter(n=>!isNaN(n));const cur=new Date().getFullYear();let minY=anos.length?Math.min.apply(null,anos):cur,maxY=anos.length?Math.max.apply(null,anos):cur;minY=Math.min(minY,cur-2);maxY=Math.max(maxY,cur+1);const totalMonths=(maxY-minY+1)*12;let head='<div class="hfc-head"><div class="hfc-label">Funcionário</div><div class="hfc-grid">';for(let y=minY;y<=maxY;y++)for(let mo=0;mo<12;mo++)head+='<div class="hfc-mon" title="'+MESES[mo]+' '+y+'">'+MESES_CURTOS[mo]+'</div>';head+='</div></div>';const byName={};d.forEach(r=>{if(!byName[r.nome])byName[r.nome]=[];byName[r.nome].push(r)});let rows='';Object.entries(byName).forEach(([nome,recs])=>{const funcR=getFuncionarios().find(g=>g.nome===nome);const cor=corDe(funcR||{nome}),ini=iniciais(nome);let bars='';recs.forEach(r=>{if(!r.inicio)return;const iy=parseInt(r.inicio.slice(0,4)),im=parseInt(r.inicio.slice(5,7))-1;const fy2=r.fim?parseInt(r.fim.slice(0,4)):iy,fm2=r.fim?parseInt(r.fim.slice(5,7))-1:im;const idxIni=((iy-minY)*12+im),idxFim=((fy2-minY)*12+fm2);const left=(idxIni/totalMonths)*100;const w=Math.max(1.5,((idxFim-idxIni+1)/totalMonths)*100);const di=d.indexOf(r);bars+='<div class="hfc-bar" style="left:'+left+'%;width:'+w+'%;background:'+cor+'" title="'+nome+' • '+fmtData(r.inicio)+' a '+fmtData(r.fim)+' ('+r.dias+'d)" onclick="abrirEditarFerias('+di+')">'+MESES_CURTOS[im]+'</div>'});rows+='<div class="hfc-row"><div class="hfc-label"><span class="ha" style="background:'+cor+'">'+ini+'</span>'+nome+'</div><div class="hfc-track">'+bars+'</div></div>'});el.innerHTML='<div class="hfc">'+head+rows+'</div>'}
 function novaFerias(){feriasEditando=-1;document.getElementById('fer-titulo').textContent='Cadastro de Férias';document.getElementById('fer-excluir-btn').style.display='none';preencherSelects();document.getElementById('fer-inicio').value='';document.getElementById('fer-dias').value='30';document.getElementById('fer-fim').value='';abrirModal('modal-ferias')}
 function abrirEditarFerias(idx){const d=load('ferias'),f=d[idx];if(!f)return;feriasEditando=idx;preencherSelects();const sel=document.getElementById('fer-func');const func=getFuncionarios().find(p=>p.nome===f.nome);if(func&&![...sel.options].some(o=>o.value===String(func.id))){sel.innerHTML='<option value="'+func.id+'">'+func.nome+'</option>'+sel.innerHTML}if(func)sel.value=String(func.id);document.getElementById('fer-inicio').value=f.inicio;document.getElementById('fer-dias').value=f.dias;calcFimFerias();document.getElementById('fer-titulo').textContent='Editar Férias';document.getElementById('fer-excluir-btn').style.display='inline-flex';abrirModal('modal-ferias')}
 function calcFimFerias(){const ini=document.getElementById('fer-inicio').value,dias=parseInt(document.getElementById('fer-dias').value)||30;if(!ini){document.getElementById('fer-fim').value='';return}const f=new Date(ini);f.setDate(f.getDate()+dias);document.getElementById('fer-fim').value=f.toISOString().slice(0,10)}
 function salvarFerias(){const id=document.getElementById('fer-func').value,inicio=document.getElementById('fer-inicio').value,dias=parseInt(document.getElementById('fer-dias').value)||30;if(!id||!inicio){alert('Selecione funcionário e data de início');return}const f=getFuncById(id);const nome=f?f.nome:id;const fim=new Date(inicio);fim.setDate(fim.getDate()+dias);const d=load('ferias');const obj={nome,mf:id,inicio,fim:fim.toISOString().slice(0,10),dias};if(feriasEditando>=0)d[feriasEditando]=obj;else d.push(obj);save('ferias',d);feriasEditando=-1;fecharModal('modal-ferias');renderTudo()}
 function abrirExcluirFerias(idx){fecharModal('modal-ferias');const f=load('ferias')[idx];abrirConfirm('Excluir férias','Deseja excluir este cadastro de férias'+(f&&f.nome?' de '+f.nome:'')+'?',function(){excluirFerias(idx)})}
 function excluirFerias(i){const d=load('ferias');if(!d[i])return;d.splice(i,1);save('ferias',d);feriasEditando=-1;fecharModal('modal-ferias');renderTudo()}
-function desempenhoFerias(){const f=perfilFunc;if(!f)return;const todas=load('ferias').filter(x=>x.nome===f.nome).sort((a,b)=>a.inicio.localeCompare(b.inicio));let body='';if(!todas.length){body='<div class="pf-empty"><span class="e-ico">🏖️</span>Nenhuma férias registrada para '+f.nome+'.</div>'}else{todas.forEach(x=>{const cor=corFuncionario(f.nome);const pct=Math.min(100,Math.max(4,(x.dias/30)*100));body+='<div class="pf-list-item" style="cursor:default"><div style="flex:1"><div class="pli-main">'+fmtData(x.inicio)+' a '+fmtData(x.fim)+'</div><div class="pli-sub">'+x.dias+' dias</div><div style="height:10px;background:#eef2f8;border-radius:6px;margin-top:6px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:'+cor+';border-radius:6px"></div></div></div></div>'})}abrirMG('Desempenho de férias de '+f.nome,body,'<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>')}
+function desempenhoFerias(){const f=perfilFunc;if(!f)return;const todas=load('ferias').filter(x=>x.nome===f.nome).sort((a,b)=>a.inicio.localeCompare(b.inicio));let body='';if(!todas.length){body='<div class="pf-empty"><span class="e-ico">🏖️</span>Nenhuma férias registrada para '+f.nome+'.</div>'}else{todas.forEach(x=>{const cor=corDe(f);const pct=Math.min(100,Math.max(4,(x.dias/30)*100));body+='<div class="pf-list-item" style="cursor:default"><div style="flex:1"><div class="pli-main">'+fmtData(x.inicio)+' a '+fmtData(x.fim)+'</div><div class="pli-sub">'+x.dias+' dias</div><div style="height:10px;background:#eef2f8;border-radius:6px;margin-top:6px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:'+cor+';border-radius:6px"></div></div></div></div>'})}abrirMG('Desempenho de férias de '+f.nome,body,'<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>')}
 function controleFerias(){const f=perfilFunc;if(!f)return;const todas=load('ferias').filter(x=>x.nome===f.nome).sort((a,b)=>b.fim.localeCompare(a.fim));const ult=todas[0];const hoje=new Date();let html='<div class="alert-info"><b>Direito a férias</b>Após 12 meses de trabalho, o funcionário adquire direito a 30 dias de férias.</div>';if(!ult){html+='<div class="alert-info" style="background:var(--laranja-claro);border-color:#f2dfc3;color:var(--laranja)"><b>Sem férias registradas</b>Nenhum período lançado. As férias ficam liberadas após o 12º mês de contrato.</div>'}else{const ultFim=new Date(ult.fim);const prox=new Date(ultFim);prox.setFullYear(prox.getFullYear()+1);const difMes=Math.round((prox-hoje)/86400000/30);const pode=difMes<=0;html+='<div class="alert-info"><b>Últimas férias</b>'+fmtData(ult.inicio)+' a '+fmtData(ult.fim)+' ('+ult.dias+' dias)</div>';if(pode){html+='<div class="alert-info" style="background:var(--verde-claro);border-color:#bfe6d1;color:var(--verde)"><b>✅ Pode tirar férias</b>Já completou o novo período aquisitivo.</div>'}else{html+='<div class="alert-info" style="background:var(--laranja-claro);border-color:#f2dfc3;color:var(--laranja)"><b>⏳ Ainda não pode tirar</b>Próxima liberação em aproximadamente '+Math.abs(difMes)+' mês(es), a partir de '+fmtData(isoDe(prox))+'.</div>'}}abrirMG('Controle de férias de '+f.nome,html,'<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>')}
-/* ===== FERIADOS ===== */
+/* ===== FERIADOS (cadastro mestre — TODOS os anos, 1900 a 2100, lista ampliada) ===== */
 let feriadoEditando=-1;
+function pascoa(ano){const a=ano%19,b=Math.floor(ano/100),c=ano%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mes=Math.floor((h+l-7*m+114)/31),dia=((h+l-7*m+114)%31)+1;return new Date(ano,mes-1,dia)}
+function addDias(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
+function gerarFeriadosPadrao(){
+  /* Feriados oficiais de Limeira — Lei nº 1.038/1968, Lei 3.473/2002,
+     Lei 4.901/2012 e Portaria nº 296 da Prefeitura (pontos facultativos). */
+  const out=[];const ANO_MIN=1900,ANO_MAX=2100;
+  for(let ano=ANO_MIN;ano<=ANO_MAX;ano++){
+    const p=pascoa(ano);
+    const carnavalSeg=addDias(p,-48),carnaval=addDias(p,-47),cinzas=addDias(p,-46);
+    const sextaPaixao=addDias(p,-2),corpus=addDias(p,60);
+    const sextaPosCorpus=addDias(corpus,1);
+    const revConstitucionalista=new Date(ano,6,9); /* 09/07 */
+    const sextaPosRev=addDias(revConstitucionalista,1);
+    const nSraDores=new Date(ano,8,15); /* 15/09 — padroeira e aniversário de Limeira */
+    const segAntesDores=new Date(ano,8,nSraDores.getDay()===1?14:15); /* segunda que antecede, se houver */
+    const iso=d=>isoDe(d);
+    /* ===== FERIADOS NACIONAIS (fixos) ===== */
+    const fixos=[[1,1,'Confraternização Universal'],[4,21,'Tiradentes'],[5,1,'Dia do Trabalho'],[9,7,'Independência do Brasil'],[10,12,'Nossa Senhora Aparecida'],[11,2,'Finados'],[11,15,'Proclamação da República'],[11,20,'Dia Nacional de Zumbi e da Consciência Negra'],[12,25,'Natal']];
+    fixos.forEach(([m,d,n])=>out.push({nome:n,data:ano+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0'),tipo:'Nacional'}));
+    /* ===== FERIADOS NACIONAIS (móveis) ===== */
+    out.push({nome:'Carnaval',data:iso(carnaval),tipo:'Nacional'});
+    out.push({nome:'Sexta-feira da Paixão',data:iso(sextaPaixao),tipo:'Nacional'});
+    out.push({nome:'Corpus Christi',data:iso(corpus),tipo:'Nacional'});
+    /* ===== FERIADO ESTADUAL (SP) ===== */
+    out.push({nome:'Revolução Constitucionalista de 1932',data:ano+'-07-09',tipo:'Estadual'});
+    /* ===== FERIADOS MUNICIPAIS DE LIMEIRA (Lei nº 1.038/1968 e alterações) ===== */
+    out.push({nome:'Sexta-feira da Paixão (municipal)',data:iso(sextaPaixao),tipo:'Municipal'});
+    out.push({nome:'Corpus Christi (municipal)',data:iso(corpus),tipo:'Municipal'});
+    out.push({nome:'Nossa Senhora das Dores — Aniversário de Limeira',data:ano+'-09-15',tipo:'Municipal'});
+    out.push({nome:'Finados (municipal)',data:ano+'-11-02',tipo:'Municipal'});
+    out.push({nome:'Dia da Consciência Negra (municipal — Lei 3.473/2002)',data:ano+'-11-20',tipo:'Municipal'});
+    /* ===== PONTOS FACULTATIVOS (Portaria nº 296 — repartições municipais) ===== */
+    out.push({nome:'Carnaval (2ª feira)',data:iso(carnavalSeg),tipo:'Facultativo'});
+    out.push({nome:'Quarta-feira de Cinzas (até 12h)',data:iso(cinzas),tipo:'Facultativo'});
+    out.push({nome:'Véspera de Tiradentes (20/04)',data:ano+'-04-20',tipo:'Facultativo'});
+    out.push({nome:'Sexta-feira após Corpus Christi',data:iso(sextaPosCorpus),tipo:'Facultativo'});
+    out.push({nome:'Sexta-feira após a Revolução Constitucionalista',data:iso(sextaPosRev),tipo:'Facultativo'});
+    out.push({nome:'Segunda-feira que antecede N. Sra. das Dores',data:iso(segAntesDores),tipo:'Facultativo'});
+    out.push({nome:'Dia do Professor (servidores da Educação)',data:ano+'-10-15',tipo:'Facultativo'});
+    out.push({nome:'Dia do Funcionário Público Municipal',data:ano+'-10-28',tipo:'Facultativo'});
+    out.push({nome:'Véspera de Natal',data:ano+'-12-24',tipo:'Facultativo'});
+    out.push({nome:'Véspera de Ano Novo',data:ano+'-12-31',tipo:'Facultativo'});
+  }
+  return out.sort((a,b)=>a.data.localeCompare(b.data));
+}
+function getFeriados(){return load('feriados')}
 function novaFeriado(){feriadoEditando=-1;document.getElementById('feri-titulo').textContent='Cadastrar Feriado';document.getElementById('feri-excluir-btn').style.display='none';document.getElementById('feri-nome').value='';document.getElementById('feri-data').value='';abrirModal('modal-feriado')}
 function abrirEditarFeriado(i){const d=load('feriados'),f=d[i];if(!f)return;feriadoEditando=i;document.getElementById('feri-nome').value=f.nome;document.getElementById('feri-data').value=f.data;document.getElementById('feri-tipo').value=f.tipo||'Nacional';document.getElementById('feri-titulo').textContent='Editar Feriado';document.getElementById('feri-excluir-btn').style.display='inline-flex';abrirModal('modal-feriado')}
-function salvarFeriado(){const nome=document.getElementById('feri-nome').value.trim(),data=document.getElementById('feri-data').value,tipo=document.getElementById('feri-tipo').value;if(!nome||!data){alert('Preencha nome e data');return}const d=load('feriados');const obj={nome,data,tipo};if(feriadoEditando>=0)d[feriadoEditando]=obj;else d.push(obj);save('feriados',d);feriadoEditando=-1;fecharModal('modal-feriado');renderTudo()}
+function salvarFeriado(){const nome=document.getElementById('feri-nome').value.trim(),data=document.getElementById('feri-data').value,tipo=document.getElementById('feri-tipo').value;if(!nome||!data){alert('Preencha nome e data');return}const d=load('feriados');const obj={nome,data,tipo};if(feriadoEditando>=0)d[feriadoEditando]=obj;else d.push(obj);d.sort((a,b)=>a.data.localeCompare(b.data));save('feriados',d);feriadoEditando=-1;fecharModal('modal-feriado');renderTudo()}
 function abrirExcluirFeriado(i){fecharModal('modal-feriado');const f=load('feriados')[i];abrirConfirm('Excluir feriado','Deseja excluir o feriado "'+(f?f.nome:'')+'"?',function(){excluirFeriadoNow(i)})}
 function excluirFeriado(i){abrirExcluirFeriado(i)}
 function excluirFeriadoNow(i){const d=load('feriados');if(!d[i])return;d.splice(i,1);save('feriados',d);fecharModal('modal-feriado');renderTudo()}
-function renderFeriados(){const d=load('feriados');const anoSel=document.getElementById('ano-base'),anos=[...new Set(d.map(f=>f.data.slice(0,4)))].sort();anoSel.innerHTML=anos.length?anos.map(a=>'<option>'+a+'</option>').join(''):'<option>'+new Date().getFullYear()+'</option>';const filtro=anos.includes(anoSel.value)?d.filter(f=>f.data.slice(0,4)===anoSel.value):d;document.getElementById('tbl-feriados').innerHTML=filtro.length?filtro.map((f,i)=>'<tr><td>'+fmtData(f.data)+'</td><td>'+f.nome+'</td><td><span class="badge tipo">'+f.tipo+'</span></td><td><div class="row-actions"><button title="Editar" onclick="abrirEditarFeriado('+i+')">✏️</button><button title="Excluir" class="danger" onclick="excluirFeriado('+i+')">🗑️</button></div></td></tr>').join(''):'<tr><td colspan="4"><div class="empty"><span class="e-ico">🎉</span>Nenhum feriado cadastrado.</div></td></tr>';renderCalendario()}
-/* ===== PERFIL (tela cheia) ===== */
+function renderFeriados(){
+  const d=getFeriados();
+  const anoSel=document.getElementById('ano-base');
+  const anos=[...new Set(d.map(f=>f.data?String(f.data).slice(0,4):null).filter(Boolean))].sort();
+  const cur=String(new Date().getFullYear());
+  const listaAnos=[...new Set([...anos,cur])].sort();
+  const oldA=anoSel.value;
+  anoSel.innerHTML=listaAnos.map(a=>'<option>'+a+'</option>').join('');
+  if(oldA&&listaAnos.includes(oldA))anoSel.value=oldA;else anoSel.value=cur;
+  const busca=(document.getElementById('feri-busca').value||'').toLowerCase();
+  const tipoF=document.getElementById('tipo-filtro').value;
+  let filtro=d;
+  if(anoSel.value)filtro=filtro.filter(f=>f.data&&f.data.slice(0,4)===anoSel.value);
+  if(tipoF)filtro=filtro.filter(f=>f.tipo===tipoF);
+  if(busca)filtro=filtro.filter(f=>f.nome.toLowerCase().includes(busca));
+  const corTipo={'Nacional':'var(--azul)','Municipal':'var(--verde)','Estadual':'var(--laranja)','Facultativo':'var(--texto-suave)'};
+  document.getElementById('tbl-feriados').innerHTML=filtro.length?filtro.map((f)=>'<tr><td>'+fmtData(f.data)+'</td><td>'+f.nome+'</td><td><span class="badge" style="background:var(--azul-claro);color:'+(corTipo[f.tipo]||'var(--texto)')+'">'+f.tipo+'</span></td><td><div class="row-actions"><button title="Editar" onclick="abrirEditarFeriado('+d.indexOf(f)+')">✏️</button><button title="Excluir" class="danger" onclick="excluirFeriado('+d.indexOf(f)+')">🗑️</button></div></td></tr>').join(''):'<tr><td colspan="4"><div class="empty"><span class="e-ico">🎉</span>Nenhum feriado encontrado com esses filtros.</div></td></tr>';
+  renderCalendario();
+}
+/* ===== PERFIL ===== */
 let perfilFunc=null,perfilNav='ponto';
-function abrirPerfil(idx){const d=getFuncionarios(),f=d[idx];if(!f)return;perfilFunc=f;perfilNav='ponto';const cor=corFuncionario(f.nome);document.getElementById('pf-avatar').textContent=iniciais(f.nome);document.getElementById('pf-avatar').style.background=cor;document.getElementById('pf-nome').textContent=f.nome;document.getElementById('pf-cargo').textContent=(f.cargo||'Cargo não informado')+' • '+(f.contrato||'');document.getElementById('pf-dep').textContent=(f.departamento||'Departamento não informado')+(f.secretaria?' • '+f.secretaria:'');document.getElementById('pf-titulo').textContent='Perfil de '+f.nome;renderPerfilNav();setPerfilNav('ponto');document.getElementById('perfil-overlay').classList.add('open')}
+function abrirPerfil(idx){const d=getFuncionarios(),f=d[idx];if(!f)return;perfilFunc=f;perfilNav='ponto';const cor=corDe(f);document.getElementById('pf-avatar').textContent=iniciais(f.nome);document.getElementById('pf-avatar').style.background=cor;document.getElementById('pf-nome').textContent=f.nome;document.getElementById('pf-cargo').textContent=(f.cargo||'Cargo não informado')+' • '+(f.contrato||'');document.getElementById('pf-dep').textContent=(f.departamento||'Departamento não informado')+(f.secretaria?' • '+f.secretaria:'');document.getElementById('pf-titulo').textContent='Perfil de '+f.nome;renderPerfilNav();setPerfilNav('ponto');document.getElementById('perfil-overlay').classList.add('open')}
 function fecharPerfil(){const o=document.getElementById('perfil-overlay');if(o)o.classList.remove('open')}
 const PF_NAV=[{k:'ponto',l:'Ponto',i:'🕐',c:'#2f9e6e'},{k:'escala',l:'Escala',i:'📅',c:'#7a5cc4'},{k:'ferias',l:'Férias',i:'🏖️',c:'#d9822b'},{k:'atestado',l:'Atestado',i:'🩺',c:'#d64545'},{k:'dados',l:'Dados Cadastrais',i:'📋',c:'#0055a4'}];
 function renderPerfilNav(){document.getElementById('pf-nav').innerHTML=PF_NAV.map(n=>'<div class="pf-nav-item '+(perfilNav===n.k?'active':'')+'" onclick="setPerfilNav(\''+n.k+'\')"><span class="pni-ico" style="background:'+n.c+'">'+n.i+'</span><span class="pni-label">'+n.l+'</span></div>').join('')}
 function setPerfilNav(k){const nav=PF_NAV.find(n=>n.k===k);if(!nav)return;perfilNav=k;renderPerfilNav();document.getElementById('pf-secao-ico').style.background=nav.c;document.getElementById('pf-secao-ico').textContent=nav.i;document.getElementById('pf-secao-titulo').textContent=nav.l;renderPerfilCards()}
 function card(ico,cor,label,sub,fn){return '<div class="pf-card" onclick="'+fn+'"><span class="pc-ico" style="background:'+cor+'">'+ico+'</span><span class="pc-txt"><span class="pc-label">'+label+'</span><span class="pc-sub">'+sub+'</span></span></div>'}
 function renderPerfilCards(){const f=perfilFunc;if(!f)return;let cards='';
-if(perfilNav==='ponto'){const p=getPontoDe(f.id);cards=card('➕','#1e9e8e','Cadastrar ponto',(p?'Expediente já existe, use Editar':'Entrada, almoço e saída'),'novaPontoDoPerfil()')+card('✏️','#1e6fd9','Editar ponto','Alterar os horários','editarPontoDoPerfil()')+card('🗑️','#d64545','Excluir ponto','Remover o expediente','excluirPontoDoPerfil()')+card('👁️','#3aa0c9','Visualizar ponto','Abrir na linha do tempo','visualizarPontoDoPerfil()')+card('🖨️','#5c6b7d','Imprimir Ponto (Excel)','Abrir folha de ponto no Ponto Digital','imprimirPontoPerfil()')}
+if(perfilNav==='ponto'){const p=getPontoDe(f.id);const vig=periodoPontoVigente(f.contrato);cards=card('🗓️','#b7791f','Competência do ponto',vig?('De '+fmtData(vig.inicio)+' até '+fmtData(vig.fim)+' • regra de '+f.contrato||''):'Sem regra para o contrato','abrirPontoDias()')+card('➕','#1e9e8e','Cadastrar ponto',(p?'Expediente já existe, use Editar':'Entrada, almoço e saída'),'novaPontoDoPerfil()')+card('✏️','#1e6fd9','Editar ponto','Alterar os horários','editarPontoDoPerfil()')+card('🗑️','#d64545','Excluir ponto','Remover o expediente','excluirPontoDoPerfil()')+card('👁️','#3aa0c9','Visualizar ponto','Abrir na linha do tempo','visualizarPontoDoPerfil()')+card('🖨️','#5c6b7d','Imprimir Ponto (Excel)','Abrir folha de ponto no Ponto Digital','imprimirPontoPerfil()')}
 else if(perfilNav==='escala'){cards=card('🪟','#7a5cc4','Alocar na escala','Definir senha, guichê, fixo ou apelido','abrirAlterarEscalaPerfil()')+card('👁️','#3aa0c9','Visualizar escala','Ver configuração atual','visualizarEscalaPerfil()')+card('🖨️','#5c6b7d','Imprimir escala','Gerar impressão','imprimirEscala()')}
 else if(perfilNav==='ferias'){cards=card('➕','#d9822b','Incluir férias','Lançar novo período','novaFeriasDoPerfil()')+card('✏️','#b7791f','Editar férias','Alterar um período','editarFeriasDoPerfil()')+card('🗑️','#d64545','Excluir férias','Remover um período','excluirFeriasDoPerfil()')+card('📈','#3aa0c9','Desempenho','Linha do tempo do funcionário','desempenhoFerias()')+card('🎯','#e05a6a','Controle','Última e próxima férias','controleFerias()')}
 else if(perfilNav==='atestado'){cards=card('➕','#d64545','Incluir falta/abono/atestado','Lançar ocorrência','novaAtestado()')+card('📋','#b7791f','Gerir ocorrências','Listar e excluir','gerirAtestados()')+card('📊','#1e6fd9','Controle do mês','Abonos, faltas e atestados','controleAtestados()')+card('📈','#2f9e6e','Frequência','Percentual de presença','frequenciaAtestado()')}
-else if(perfilNav==='dados'){cards=card('🆔','#0055a4','Matrícula','Incluir ou editar','cardMatricula()')+card('➕','#1e6fd9','Incluir cargo','Adicionar cargo','abrirCargoCadastro()')+card('✏️','#b7791f','Editar cargo','Renomear cargo','cardEditarCargo()')+card('➕','#2f9e6e','Incluir departamento','Adicionar departamento','abrirDepCadastro()')+card('📋','#7a5cc4','Gerir departamento','Listar e remover','cardGerirDep()')}
+else if(perfilNav==='dados'){cards=card('🆔','#0055a4','Matrícula','Incluir ou editar','cardMatricula()')+card('🎨',f.cor||'#1e6fd9','Cor do funcionário',f.cor?'Cor personalizada: '+f.cor:'Automática (pelo nome)','abrirCorPerfil()')+card('➕','#2f9e6e','Incluir departamento','Adicionar departamento','abrirDepCadastro()')+card('📋','#7a5cc4','Gerir departamento','Listar e remover','cardGerirDep()')}
 document.getElementById('pf-cards').innerHTML=cards}
+function abrirCorPerfil(){abrirMG('Cor de '+perfilFunc.nome,'<div class="field"><label>Escolha a cor</label><div class="cor-picker" id="fu-cor-picker"></div></div>','<button class="btn btn-ghost" onclick="fecharModal(\'modal-generic\')">Cancelar</button><button class="btn" onclick="salvarCorPerfil()">Salvar</button>');renderCorPicker(perfilFunc.cor||'')}
+function salvarCorPerfil(){const d=getFuncionarios();const i=d.findIndex(x=>String(x.id)===String(perfilFunc.id));if(i>=0){d[i].cor=corSelecionada||'';save('funcionarios',d);perfilFunc=d[i];fecharModal('modal-generic');renderTudo();const idx=getFuncionarios().indexOf(perfilFunc);if(idx>=0)abrirPerfil(idx)}}
 function novaPontoDoPerfil(){abrirModalPonto(perfilFunc.id)}
 function editarPontoDoPerfil(){const p=getPontoDe(perfilFunc.id);if(!p){abrirMG('Editar ponto','<div class="pf-empty"><span class="e-ico">🕐</span>Nenhum ponto cadastrado para '+perfilFunc.nome+'. Use "Cadastrar ponto".</div>','<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>');return}abrirModalPonto(perfilFunc.id)}
-function excluirPontoDoPerfil(){const p=getPontoDe(perfilFunc.id);if(!p){abrirMG('Excluir ponto','<div class="pf-empty"><span class="e-ico">🕐</span>Nenhum ponto cadastrado para '+perfilFunc.nome+'.</div>','<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>');return}abrirExcluirPonto()}
+function excluirPontoDoPerfil(){const p=getPontoDe(perfilFunc.id);if(!p){abrirMG('Excluir ponto','<div class="pf-empty"><span class="e-ico">🕐</span>Nenhum ponto cadastrado para '+perfilFunc.nome+'.</div>','<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>');return}abrirModalPontoExcluir(perfilFunc.id)}
 function visualizarPontoDoPerfil(){document.getElementById('ponto-busca').value=perfilFunc.nome;fecharPerfil();go('ponto')}
 function imprimirPontoPerfil(){fecharPerfil();imprimirPontoExcel(perfilFunc.nome)}
 function abrirAlterarEscalaPerfil(){abrirAlterarEscala(perfilFunc.id)}
@@ -626,21 +816,25 @@ function cardMatricula(){const body='<div class="field"><label>Matrícula</label
 function salvarMatricula(){const nova=document.getElementById('cm-mat').value.trim();if(!nova){alert('Informe a matrícula');return}const d=getFuncionarios();const i=d.findIndex(x=>String(x.id)===String(perfilFunc.id));if(i>=0){d[i].matricula=nova;save('funcionarios',d);perfilFunc=d[i];fecharModal('modal-generic');renderTudo();abrirPerfil(i)}}
 function cardGerirDep(){const deps=load('departamentos');const body=deps.length?deps.map(d=>'<div class="pf-list-item" style="cursor:default"><div class="pli-main">'+d+'</div><button class="btn btn-small btn-danger" onclick="excluirDepartamento(\''+d.replace(/'/g,"\\'")+'\')">Excluir</button></div>').join(''):'<div class="pf-empty"><span class="e-ico">🏢</span>Nenhum departamento cadastrado.</div>';abrirMG('Gerir departamentos',body,'<button class="btn" onclick="fecharModal(\'modal-generic\')">Fechar</button>')}
 function excluirDepartamento(nome){abrirConfirm('Excluir departamento','Deseja excluir o departamento "'+nome+'" do sistema?',function(){const d=load('departamentos');const i=d.indexOf(nome);if(i>=0)d.splice(i,1);save('departamentos',d);fecharModal('modal-generic');renderTudo()})}
-/* ===== HOME (com botão Imprimir Ponto no card) ===== */
+/* ===== HOME ===== */
 function renderHome(){
   const d=getFuncionarios();
   const grid=document.getElementById('func-grid');
   if(!d.length){grid.innerHTML='<div class="empty"><span class="e-ico">👥</span>Nenhum funcionário cadastrado. Use o módulo Funcionários.</div>';return}
   grid.innerHTML=d.map((f,i)=>{
-    const cor=corFuncionario(f.nome);
+    const cor=corDe(f);
     const nomeEsc=f.nome.replace(/'/g,"\\'");
     return '<div class="func-card" onclick="abrirPerfil('+i+')"><div class="func-avatar" style="background:'+cor+'">'+iniciais(f.nome)+'</div><div class="func-info"><div class="fn">'+f.nome+'</div><div class="fm">'+(f.cargo||'-')+(f.departamento?' • '+f.departamento:'')+(f.contrato?' • '+f.contrato:'')+'</div></div><div class="func-actions"><button class="fa-btn" title="Imprimir Ponto (Excel do Ponto Digital)" onclick="event.stopPropagation();imprimirPontoExcel(\''+nomeEsc+'\')">🖨️</button><button class="fa-btn" title="Abrir perfil" onclick="event.stopPropagation();abrirPerfil('+i+')">👁️</button></div></div>'
   }).join('');
 }
+function imprimirPonto(){window.print()}
+function imprimirEscala(){window.print()}
 document.addEventListener('wheel',function(e){const t=e.target.closest?e.target.closest('#gantt-ferias'):null;if(t){e.preventDefault();feriasNav(e.deltaY>0?1:-1)}},{passive:false});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));fecharPerfil()}});
-function renderTudo(){renderHome();renderFuncionarios();renderPonto();renderPontos();renderEscala();renderEscalas();renderFerias();renderHistFerias();renderFeriados();renderCalendario()}
+function renderTudo(){renderHome();renderFuncionarios();renderPonto();renderEscala();renderFerias();renderHistFerias();renderFeriados();renderCalendario()}
 renderTudo();
 </script>
 </body>
 </html>
+
+
